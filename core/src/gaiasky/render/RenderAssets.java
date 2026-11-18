@@ -50,7 +50,8 @@ public class RenderAssets {
     private static final Log logger = Logger.getLogger(RenderAssets.class);
     private final GlobalResources globalResources;
     public ExtShaderProgram distanceFieldFontShader;
-    public ExtShaderProgram[] billboardShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders, lineQuadCpuShaders, lineQuadGpuShaders,
+    public ExtShaderProgram[] billboardShaders, billboardStarShaders, billboardStarDepthShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders,
+            lineQuadCpuShaders, lineQuadGpuShaders,
             primitiveGpuShaders, billboardGroupShaders, billboardProceduralShaders, billboardProceduralCpuShaders, particleStreakShaders, particleGroupShaders,
             particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, orbitElemShaders;
     public IntModelBatch mbSimple, mbSimpleAdditive, mbVertexDiffuse, mbSimpleStarSurface, mbSimpleThruster,
@@ -62,7 +63,8 @@ public class RenderAssets {
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc,
             variableGroupDesc, particleStreakDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc,
-            billboardGroupDesc, billboardProceduralDesc, billboardProceduralCpuDesc, galDesc, spriteDesc, billboardDesc;
+            billboardGroupDesc, billboardProceduralDesc, billboardProceduralCpuDesc, billboardStarDesc, billboardStarDepthDesc, galDesc, spriteDesc,
+            billboardDesc;
 
     private final boolean compute;
     private final boolean tessellation;
@@ -122,6 +124,22 @@ public class RenderAssets {
                                       "shader/billboard.fragment.glsl",
                                       TextUtils.concatAll("regular.billboard", names),
                                       defines);
+        // Near-field stars get their own program: the quad is oriented like every
+        // other billboard, but shaded in apparent radii by lib/starnear.glsl, and
+        // the vertex stage also passes the world-space axes the surface needs.
+        billboardStarDesc = loadShaderExt(manager,
+                                          "shader/star.billboard.vertex.glsl",
+                                          "shader/star.billboard.fragment.glsl",
+                                          TextUtils.concatAll("regular.billboard.star", names),
+                                          defines);
+        // Depth-only variant of the same program, used as a prepass so that the
+        // solid photosphere writes depth (see the STAR_DEPTH_ONLY branch).
+        billboardStarDepthDesc = loadShaderExt(manager,
+                                               "shader/star.billboard.vertex.glsl",
+                                               "shader/star.billboard.fragment.glsl",
+                                               TextUtils.concatAll("regular.billboard.star.depth", names),
+                                               defines,
+                                               "#define STAR_DEPTH_ONLY\n");
         spriteDesc = loadShaderExt(manager,
                                    "shader/sprite.vertex.glsl",
                                    "shader/sprite.fragment.glsl",
@@ -304,6 +322,9 @@ public class RenderAssets {
           BILLBOARD SHADER
          */
         billboardShaders = fetchShaderProgramExt(manager, billboardDesc, TextUtils.concatAll("regular.billboard", names));
+        billboardStarShaders = fetchShaderProgramExt(manager, billboardStarDesc, TextUtils.concatAll("regular.billboard.star", names));
+        billboardStarDepthShaders = fetchShaderProgramExt(manager, billboardStarDepthDesc,
+                                                          TextUtils.concatAll("regular.billboard.star.depth", names));
 
         /*
          * GALAXY SHADER

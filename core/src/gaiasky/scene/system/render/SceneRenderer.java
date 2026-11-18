@@ -100,6 +100,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private List<RenderGroup> renderGroups;
     private RenderSystemRunnable depthTestR,
             additiveBlendR,
+            premultipliedBlendR,
             noDepthTestR,
             regularBlendR,
             depthTestNoWritesR,
@@ -190,6 +191,14 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         regularBlendR = (renderSystem, renderList, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             GL40.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        };
+        // Premultiplied alpha: the source is added, and the destination is
+        // attenuated by the source alpha. Lets one pass have opaque fragments
+        // (the photosphere blocks the background) and emissive ones (the corona
+        // is added without dimming anything).
+        premultipliedBlendR = (renderSystem, renderList, camera) -> {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            GL40.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
         };
         clearDepthR = (renderSystem, renderList, camera) -> Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         colorMaskOnR = (renderSystem, renderList, camera) -> {
@@ -411,14 +420,19 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
             case BILLBOARD_STAR -> {
-                system = new BillboardRenderer(this,
-                                               BILLBOARD_STAR,
-                                               alphas,
-                                               renderAssets.billboardShaders,
-                                               GaiaSky.settings().scene.star.getStarTexture(),
-                                               true);
-                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
-                system.addPostRunnables(lpu);
+                var starRenderer = new BillboardRenderer(this,
+                                                         BILLBOARD_STAR,
+                                                         alphas,
+                                                         renderAssets.billboardStarShaders,
+                                                         GaiaSky.settings().scene.star.getStarTexture(),
+                                                         true);
+                // Depth prepass for the solid photosphere, so that lines, labels and the
+                // rest of the late geometry are occluded by the star.
+                starRenderer.setDepthPrograms(renderAssets.billboardStarDepthShaders);
+                // Not additive: the photosphere has to block what is behind it.
+                starRenderer.addPreRunnables(premultipliedBlendR, depthTestNoWritesR);
+                starRenderer.addPostRunnables(lpu);
+                system = starRenderer;
             }
             case BILLBOARD_GAL -> {
                 system = new BillboardRenderer(this,

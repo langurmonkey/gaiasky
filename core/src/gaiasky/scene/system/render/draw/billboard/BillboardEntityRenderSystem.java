@@ -191,6 +191,8 @@ public class BillboardEntityRenderSystem implements IObserver {
 
         // GENERAL UNIFORMS
         shader.setUniformf("u_th_angle_point", (float) thPointTimesFovFactor);
+        // Camera forward, to place the photosphere in depth (see star.billboard.fragment.glsl).
+        shader.setUniformf("u_camDir", camera.getCamera().direction);
         // Light glow always disabled with star groups
         shader.setUniformi("u_lightScattering", 0);
         shader.setUniformf("u_inner_rad", (float) innerRad);

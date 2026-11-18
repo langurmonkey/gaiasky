@@ -163,8 +163,13 @@ public enum RenderGroup {
     BILLBOARD_GAL(5400),
     /**
      * Star billboards.
+     * <p>
+     * Drawn early (before {@link #FONT_LABEL} and {@link #LINE}), because the solid photosphere
+     * writes depth: lines, labels and the rest of the late geometry have to find that depth in
+     * the buffer to be occluded by the star. It still comes after {@link #STAR_GROUP}, so the
+     * near star covers the unresolved background stars.
      **/
-    BILLBOARD_STAR(5500),
+    BILLBOARD_STAR(2050),
     /**
      * Volumetric clouds, raymarched. Drawn before the atmosphere, so that aerial perspective is
      * applied on top of them rather than the other way round. See

@@ -8,6 +8,7 @@
 package gaiasky.scene.system.render.draw;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -37,6 +38,8 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     private final BillboardEntityRenderSystem renderSystem;
     private IntMesh mesh;
     private Texture billboardTexture;
+    /** Optional depth-only variant of the same quads, see {@link #setDepthPrograms}. **/
+    private ExtShaderProgram[] depthPrograms;
 
     // Render metadata
 
@@ -163,6 +166,49 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
             render(entity, shaderProgram, mesh, camera);
         });
         shaderProgram.end();
+
+        if (depthPrograms != null) {
+            renderDepthStud(renderables, camera, t);
+        }
+    }
+
+    /**
+     * Depth-only pass over the same quads. The fragment shader of this variant keeps only the
+     * solid photosphere and writes its depth, so lines, labels and other late elements are
+     * occluded by the star body. Runs after the colour pass: both use the same less-than depth
+     * test, so the disc's own colour fragments would otherwise be rejected by the depth they
+     * have just written.
+     */
+    private void renderDepthStud(List<IRenderable> renderables, ICamera camera, double t) {
+        ExtShaderProgram depthProgram = getShaderProgram(depthPrograms);
+        depthProgram.begin();
+        // Colour goes nowhere, depth is written.
+        Gdx.gl.glColorMask(false, false, false, false);
+        Gdx.gl.glDepthMask(true);
+        try {
+            addCameraUpCubemapMode(depthProgram, camera);
+            depthProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+            depthProgram.setUniformf("u_time", (float) t);
+            addEffectsUniforms(depthProgram, camera);
+
+            renderables.forEach(r -> {
+                Entity entity = ((Render) r).entity;
+                render(entity, depthProgram, mesh, camera);
+            });
+        } finally {
+            depthProgram.end();
+            Gdx.gl.glColorMask(true, true, true, true);
+            // Back to the state the pre-runnables set for this group.
+            Gdx.gl.glDepthMask(false);
+        }
+    }
+
+    /**
+     * Sets the depth-only variant of the same quad programs. When set, a depth prepass runs after
+     * the colour pass for every billboard of this group.
+     */
+    public void setDepthPrograms(ExtShaderProgram[] depthPrograms) {
+        this.depthPrograms = depthPrograms;
     }
 
     /**
