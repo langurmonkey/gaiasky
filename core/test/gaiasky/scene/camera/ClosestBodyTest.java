@@ -80,7 +80,7 @@ public class ClosestBodyTest {
         // The speed is linear in the smoothed distance, so a factor of 1e13 between two references
         // must not become a factor of 1e13 in speed within one frame.
         double current = 1.0e4;
-        double next = NaturalCamera.limitGrowth(current, 1.0e20, 1.0 / 90.0);
+        double next = NaturalCamera.limitGrowth(current, 1.0e20, 1.0 / 90.0, NaturalCamera.DISTANCE_MAX_GROWTH_RATE);
         Assert.assertTrue(next < current * 1.03);
         Assert.assertTrue(next > current);
     }
@@ -91,7 +91,7 @@ public class ClosestBodyTest {
         double current = 1.0e4;
         double sum = current;
         for (int i = 0; i < 90; i++) {
-            sum = NaturalCamera.limitGrowth(sum, 1.0e20, 1.0 / 90.0);
+            sum = NaturalCamera.limitGrowth(sum, 1.0e20, 1.0 / 90.0, NaturalCamera.DISTANCE_MAX_GROWTH_RATE);
         }
         Assert.assertEquals(4.48, sum / current, 0.1);
     }
@@ -99,6 +99,6 @@ public class ClosestBodyTest {
     @Test
     public void theSpeedScalingDropsImmediately() {
         // Getting closer to something has to slow the camera down at once.
-        Assert.assertEquals(10, NaturalCamera.limitGrowth(1.0e6, 10, 1.0 / 90.0), 0);
+        Assert.assertEquals(10, NaturalCamera.limitGrowth(1.0e6, 10, 1.0 / 90.0, NaturalCamera.DISTANCE_MAX_GROWTH_RATE), 0);
     }
 }

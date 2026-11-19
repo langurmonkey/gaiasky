@@ -382,12 +382,35 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private static final double DISTANCE_SMOOTHING_TAU = 0.1d;
 
     /**
-     * Maximum relative growth of the speed scaling, in e-folds per second. The scaling is linear in
-     * the smoothed distance, so this caps how fast the top speed can rise when the reference object
-     * changes: about 4.5x per second, i.e. roughly 5 seconds to go from the solar system to the
-     * interstellar regime.
+     * Maximum relative growth of the speed scaling, in e-folds per second, when the reference
+     * object changes. The scaling is linear in the smoothed distance, so this caps how fast the top
+     * speed can rise after a handoff: about 4.5x per second, i.e. roughly 5 seconds to go from the
+     * solar system to the interstellar regime.
      */
-    private static final double DISTANCE_MAX_GROWTH_RATE = 1.5d;
+    static final double DISTANCE_MAX_GROWTH_RATE = 1.5d;
+
+    /**
+     * Maximum relative growth of the speed scaling, in e-folds per second, when the reference is the
+     * same and the distance only grows because the camera is flying away from it. That is real
+     * motion, not a discontinuity, so it may be much faster: leaving a star bubble takes about two
+     * seconds from the low limit to the top speed, against twenty at
+     * {@link #DISTANCE_MAX_GROWTH_RATE}.
+     */
+    static final double DISTANCE_GROWTH_RATE = 12.0d;
+
+    /**
+     * Factor by which the raw distance may grow from one frame to the next before the reference is
+     * assumed to have changed. A continuous fly-away grows the distance by a few percent per frame;
+     * a handoff or a culled body multiplies it by orders of magnitude.
+     */
+    private static final double REFERENCE_JUMP_FACTOR = 4.0d;
+
+    /**
+     * Hard cap on the growth of the smoothed distance in a single frame. Frame-rate safety net on
+     * top of the rate caps: a stall or a breakpoint would otherwise let a whole second worth of
+     * growth through at once.
+     */
+    private static final double DISTANCE_MAX_FRAME_RATIO = 4.0d;
 
     /**
      * Raw (unsmoothed) distance to the closest body, in internal units.
@@ -1909,30 +1932,38 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double alpha = smoothingAlpha(DISTANCE_SMOOTHING_TAU, dt);
         double next = smoothedDistance + (raw - smoothedDistance) * alpha;
 
-        smoothedDistance = limitGrowth(smoothedDistance, next, dt);
+        // Only a discontinuity in the raw distance means that the reference changed. A gradual one
+        // means that the very same reference is getting farther away, so the camera is simply flying
+        // out of its neighbourhood and the speed has to follow, not crawl up to it.
+        double rate = raw > smoothedDistance * REFERENCE_JUMP_FACTOR
+                ? DISTANCE_MAX_GROWTH_RATE
+                : DISTANCE_GROWTH_RATE;
+
+        smoothedDistance = limitGrowth(smoothedDistance, next, dt, rate);
     }
 
     /**
      * Bounds the relative growth of a smoothed distance. The speed scaling is linear in this
-     * distance, so bounding its growth bounds the growth of the speed: no change of reference (a
-     * planet fading out, a star group swapping its nearest star, the closest body becoming the
-     * nearest star) can multiply the speed by more than {@code e^DISTANCE_MAX_GROWTH_RATE} per
-     * second. The decay is deliberately left unbounded - slowing down when something gets closer
-     * has to be immediate.
+     * distance, so bounding its growth bounds the growth of the speed. The decay is deliberately
+     * left unbounded - slowing down when something gets closer has to be immediate.
      *
      * @param current The current smoothed distance.
      * @param next    The distance the filter wants to move to.
      * @param dt      The frame delta time, in seconds.
+     * @param rate    Maximum growth, in e-folds per second.
      *
      * @return The next distance, with its growth limited.
      */
     static double limitGrowth(double current,
                               double next,
-                              double dt) {
+                              double dt,
+                              double rate) {
         if (dt <= 0 || current <= 0 || !Double.isFinite(current) || !Double.isFinite(next)) {
             return next;
         }
-        return FastMath.min(next, current * FastMath.exp(DISTANCE_MAX_GROWTH_RATE * dt));
+        double byRate = current * FastMath.exp(rate * dt);
+        double byFrame = current * DISTANCE_MAX_FRAME_RATIO;
+        return FastMath.min(next, FastMath.min(byRate, byFrame));
     }
 
     /**
