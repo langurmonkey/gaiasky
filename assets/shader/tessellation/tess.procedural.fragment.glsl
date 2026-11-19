@@ -165,12 +165,11 @@ void main() {
     float shadowMap = clamp(getShadow(o_data.shadowMapUv, o_data.csmLightSpacePos, length(o_data.fragPosWorld)), 0.0, 1.0);
     #else
     // Regular shadow mapping.
-    float transparency = 1.0 - texture(u_shadowTexture, o_data.shadowMapUv.xy).g;
 
     #ifdef shadowMapGlobalFlag
-    float shadowMap = clamp(getShadow(o_data.shadowMapUv, o_data.shadowMapUvGlobal) + transparency, 0.0, 1.0);
+    float shadowMap = clamp(getShadow(o_data.shadowMapUv, o_data.shadowMapUvGlobal), 0.0, 1.0);
     #else
-    float shadowMap = clamp(getShadow(o_data.shadowMapUv) + transparency, 0.0, 1.0);
+    float shadowMap = clamp(getShadow(o_data.shadowMapUv), 0.0, 1.0);
     #endif // shadowMapGlobalFlag
     #endif // numCSM
     #else

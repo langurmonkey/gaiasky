@@ -9,9 +9,21 @@ uniform sampler2D u_shadowTextureGlobal;
 #endif //shadowMapGlobalFlag
 uniform float u_shadowPCFOffset;
 
+// A texel of the map holds the depth of the nearest surface in the red channel and the opacity of
+// that surface in the green one, as written by depth.fragment.glsl. The map is cleared to
+// (0, 0, 0, 1), so a texel with nothing in it has an opacity of zero: it has to read as fully lit,
+// because treating it as the nearest possible surface shadows everything that falls outside the
+// map.
 float getShadowness(sampler2D sampler, vec2 uv, vec2 offset, float compare) {
-    const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0);
-    return step(compare, dot(texture(sampler, uv.xy + offset), bitShifts) + bias); // (1.0/255.0)
+    vec4 texel = texture(sampler, uv.xy + offset);
+    float opacity = texel.g;
+    if (opacity <= 0.0) {
+        // Nothing occludes here.
+        return 1.0;
+    }
+    // Lit when the fragment is in front of the stored surface; behind it, the surface blocks the
+    // light up to its opacity.
+    return mix(1.0 - opacity, 1.0, step(compare, texel.r + bias));
 }
 
 #ifdef numCSM
@@ -23,6 +35,11 @@ uniform float u_csmPCF;
 int layer = -1;
 
 float getCSMShadow(sampler2D sampler, vec3 uv, float pcf) {
+    // Same reasoning as in getShadowSingular: outside the cascade there is nothing to compare
+    // against, and the clamped border texel would shadow the fragment.
+    if (uv.x < pcf || uv.x > 1.0 - pcf || uv.y < pcf || uv.y > 1.0 - pcf || uv.z < 0.0 || uv.z > 1.0) {
+        return 1.0;
+    }
     return (
     getShadowness(sampler, uv.xy, vec2(pcf,pcf), uv.z) +
     getShadowness(sampler, uv.xy, vec2(-pcf,pcf), uv.z) +
@@ -107,6 +124,18 @@ float textureShadowLerp(sampler2D sampler, vec2 size, vec2 uv, float compare){
 float getShadowSingular(sampler2D shadowMap, vec3 shadowMapUv) {
     // Complex lookup: PCF + interpolation (see http://codeflow.org/entries/2013/feb/15/soft-shadow-mapping/)
     vec2 size = vec2(1.0 / (2.0 * u_shadowPCFOffset));
+    // Outside the map, and in front of or behind its depth range, there is nothing to compare
+    // against: the fragment is lit. The texture is clamped to the edge, so without this the taps
+    // that fall off the map return the border texel, which is the silhouette of the occluder, and
+    // paint a hard black band there.
+    // The footprint of the filter is three texels: the two of the loop below, plus the extra one
+    // that textureShadowLerp adds when it rounds to the nearest texel and interpolates.
+    vec2 margin = 3.0 / size;
+    if (shadowMapUv.x < margin.x || shadowMapUv.x > 1.0 - margin.x ||
+        shadowMapUv.y < margin.y || shadowMapUv.y > 1.0 - margin.y ||
+        shadowMapUv.z < 0.0 || shadowMapUv.z > 1.0) {
+        return 1.0;
+    }
     float result = 0.0;
     for(int x=-2; x<=2; x++) {
         for(int y=-2; y<=2; y++) {
