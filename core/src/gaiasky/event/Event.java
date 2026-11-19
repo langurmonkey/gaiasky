@@ -1139,6 +1139,8 @@ public enum Event {
     SHOW_LOAD_DATASET_ACTION,
     /** Shows the log window. **/
     SHOW_LOG_CMD,
+    /** Shows the closest-star distance scaling window. **/
+    SHOW_STAR_DISTANCE_CMD,
     /**
      * Procedural surface, atmosphere, and clouds generation.
      */

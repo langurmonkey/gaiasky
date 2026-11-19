@@ -1,4 +1,4 @@
-#v3070401
+#v3070402
 # This file contains the key mappings for Gaia Sky.
 
 # Each line contains an action=keys pair, where action is the
@@ -200,3 +200,5 @@ action.slave.configure                      = S L V
 action.ui.reload                            = CTRL_L SHIFT_L U I
 # doc: Recompile and reload shaders
 action.shaders.reload                       = CTRL_L SHIFT_L Y
+# doc: Show closest-star distance scaling window
+action.stardistance                         = CTRL_L SHIFT_L D

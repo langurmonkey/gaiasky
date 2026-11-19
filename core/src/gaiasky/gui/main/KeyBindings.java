@@ -304,6 +304,9 @@ public class KeyBindings {
         // show log dialog
         addAction(new ProgramAction("action.log", () -> EventManager.publish(Event.SHOW_LOG_CMD, this), noCleanMode));
 
+        // show closest-star distance scaling window
+        addAction(new ProgramAction("action.stardistance", () -> EventManager.publish(Event.SHOW_STAR_DISTANCE_CMD, this), noGameCondition));
+
         // Toggle orbits
         addAction(new ProgramAction("action.toggle/element.orbits", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.orbits")));
 

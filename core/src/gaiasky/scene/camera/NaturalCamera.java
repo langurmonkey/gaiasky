@@ -394,11 +394,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     private double rawBodyDistance = Double.MAX_VALUE;
     /**
-     * Raw (unsmoothed) smoothed-radius distance to the closest star.
+     * Raw (unsmoothed) smoothed-radius distance to the closest star, blended into
+     * {@link #regularDistance} with the low and high limits.
      */
     private double rawStarDistance = Double.MAX_VALUE;
     /**
-     * Minimum of {@link #rawBodyDistance} and {@link #rawStarDistance} (plus the focus distance).
+     * Raw (unsmoothed) distance the camera uses when no star is nearby: the minimum of
+     * {@link #rawBodyDistance} and the focus distance.
+     */
+    private double regularDistance = Double.MAX_VALUE;
+    /**
+     * Minimum of {@link #rawStarDistance} and {@link #regularDistance}.
      */
     private double rawDistance = Double.MAX_VALUE;
 
@@ -1691,31 +1697,61 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Computes the final distance to use for the speed scaling, given the closest object's radius and distance. This method takes into account
-     * the focus object if the camera is in focus mode, and creates a smoothing function between the distance of the closest object and that of the
-     * focus.
+     * Blends the closest-star distance into the distance the camera would use without a star
+     * nearby. A blend of 0 returns the star distance, a blend of 1 the regular distance, so each
+     * star only affects the speed inside its own bubble.
+     * <p>
+     * The mix is geometric, not linear: the two distances routinely differ by many orders of
+     * magnitude (a star radius against a distance of light years), and a linear mix would be
+     * dominated by the larger one and jump as soon as the blend leaves 0.
      *
-     * @param distance           The distance to the closest object.
-     * @param smoothingDistance0 First interpolation distance for smoothing.
-     * @param smoothingDistance1 Second interpolation distance for smoothing.
+     * @param starDistance    Distance to the closest star, in internal units.
+     * @param regularDistance Distance used when no star is nearby, in internal units.
+     * @param blend           Blend factor, in [0, 1].
      *
-     * @return The distance scale to compute the camera speed scaling factor.
+     * @return The blended distance, in internal units.
      */
-    private double computeDistanceScale(double distance,
-                                        double smoothingDistance0,
-                                        double smoothingDistance1) {
-        if (getMode().isFocus()) {
-            var focusDistance = focus.getDistToCamera() + minDist();
-            // Compute interpolation value between focus and closest star.
-            var a = distance < smoothingDistance0 ?
-                    0.0
-                    : (distance > smoothingDistance1 ?
-                    1.0 :
-                    (distance - smoothingDistance0) / (smoothingDistance1 - smoothingDistance0));
-            return MathUtilsDouble.mix(distance, focusDistance, a);
-        } else {
-            return distance;
+    static double blendStarDistance(double starDistance,
+                                    double regularDistance,
+                                    double blend) {
+        if (!Double.isFinite(starDistance) || starDistance <= 0) {
+            return regularDistance;
         }
+        if (!Double.isFinite(regularDistance) || regularDistance <= 0) {
+            return starDistance;
+        }
+        if (blend <= 0) {
+            return starDistance;
+        }
+        if (blend >= 1) {
+            return regularDistance;
+        }
+        return FastMath.exp(Math.log(starDistance) * (1 - blend) + Math.log(regularDistance) * blend);
+    }
+
+    /**
+     * Interpolation factor between the low and high distance limits: 0 below the low limit, 1 above
+     * the high one, linear in between.
+     *
+     * @param distance The distance to interpolate.
+     * @param low      The low limit.
+     * @param high     The high limit.
+     *
+     * @return The interpolation factor, in [0, 1].
+     */
+    static double starDistanceBlend(double distance,
+                                    double low,
+                                    double high) {
+        if (!Double.isFinite(distance) || !Double.isFinite(low) || !Double.isFinite(high) || high <= low) {
+            return distance >= high ? 1d : 0d;
+        }
+        if (distance <= low) {
+            return 0d;
+        }
+        if (distance >= high) {
+            return 1d;
+        }
+        return (distance - low) / (high - low);
     }
 
     /**
@@ -1785,9 +1821,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         var focusDistance = getMode().isFocus() && focus != null ? focus.getDistToCamera() : Double.MAX_VALUE;
 
-        rawStarDistance = getClosestStarDistance();
+        // Distance the camera uses with no star nearby: what it uses with the star distance
+        // scaling off entirely. Anything past DIST_SMOOTH_UP maps to the same speed, so the
+        // saturation distance is used as the reference there instead of infinity: otherwise the
+        // star would be blended against an almost infinite distance and could never slow the
+        // camera down in empty space, which is precisely where it has to.
+        regularDistance = FastMath.min(DIST_SMOOTH_UP, FastMath.min(rawBodyDistance, focusDistance));
 
-        rawDistance = FastMath.min(rawStarDistance, FastMath.min(rawBodyDistance, focusDistance));
+        rawStarDistance = getClosestStarDistance(regularDistance);
+
+        rawDistance = FastMath.min(rawStarDistance, regularDistance);
         rawDistancesValid = true;
 
         return rawDistance;
@@ -1893,28 +1936,136 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * For stars, we implement a smoothing radius.
-     *
-     * @return The raw (unsmoothed) minimum distance to a star, with a smoothing radius.
+     * Radius multiplier at which the closest-star distance starts blending in. Below
+     * {@code starRadius * this} the star distance is used as is.
      */
-    private double getClosestStarDistance() {
-        if (GaiaSky.instance.cameraManager.getMode()
-                .isFocus() || !GaiaSky.settings().scene.camera.starDistanceScaling) {
+    private double starDistanceScaleLow = 5.0E4;
+    /**
+     * Radius multiplier at which the closest-star distance has fully faded out. Above
+     * {@code starRadius * this} the closest star no longer influences the distance.
+     */
+    private double starDistanceScaleHigh = 4.0E7;
+
+    public double getStarDistanceScaleLow() {
+        return starDistanceScaleLow;
+    }
+
+    public void setStarDistanceScaleLow(double starDistanceScaleLow) {
+        if (Double.isFinite(starDistanceScaleLow) && starDistanceScaleLow > 0) {
+            this.starDistanceScaleLow = starDistanceScaleLow;
+        }
+    }
+
+    public double getStarDistanceScaleHigh() {
+        return starDistanceScaleHigh;
+    }
+
+    public void setStarDistanceScaleHigh(double starDistanceScaleHigh) {
+        if (Double.isFinite(starDistanceScaleHigh) && starDistanceScaleHigh > 0) {
+            this.starDistanceScaleHigh = starDistanceScaleHigh;
+        }
+    }
+
+    /**
+     * Distance to the closest star, blended into the regular distance with the low and high radius
+     * multipliers. Below the low limit the star distance is used as is, above the high limit it is
+     * ignored, and in between the two are mixed: each star slows the camera down only inside its
+     * own bubble.
+     *
+     * @param regularDistance The distance the camera uses when no star is nearby, in internal units.
+     *
+     * @return The blended distance, or {@link Double#MAX_VALUE} if the star distance is not to be
+     * used at all.
+     */
+    private double getClosestStarDistance(double regularDistance) {
+        if (getMode().isFocus() || !GaiaSky.settings().scene.camera.starDistanceScaling) {
             // Do not use star distance to compute velocity scaling.
             // Occasionally, traversing the star field with speed scaling depending on the closest star is actually not good.
             // Speed jumps after metadata updates are too noticeable.
             return Double.MAX_VALUE;
-        } else {
-            var star = proximity.effective[0];
-            if (star == null) return NO_CLOSEST_BODY_DISTANCE;
-
-            var radius = star.getRadius();
-            var distance = star.getClosestDistToCamera() + minDist();
-
-            double dist0Scale = 1.0E3;
-            double dist1Scale = 1.0E7;
-            return computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
         }
+        var star = proximity != null ? proximity.effective[0] : null;
+        if (star == null) {
+            return Double.MAX_VALUE;
+        }
+
+        var radius = star.getRadius();
+        var starDistance = star.getClosestDistToCamera() + minDist();
+        var blend = starDistanceBlend(starDistance, radius * starDistanceScaleLow, radius * starDistanceScaleHigh);
+
+        return blendStarDistance(starDistance, regularDistance, blend);
+    }
+
+    /**
+     * Snapshot of the closest-star distance scaling, for the star distance window. Read-only: it
+     * does not modify any camera state.
+     *
+     * @param starName         Name of the closest star, or null if there is none.
+     * @param radius           Radius of the closest star, in internal units.
+     * @param starDistance     Distance to the closest star, in internal units.
+     * @param limitLow         Low limit, {@code radius * starDistanceScaleLow}, in internal units.
+     * @param limitHigh        High limit, {@code radius * starDistanceScaleHigh}, in internal units.
+     * @param blend            0 when the star distance is used as is, 1 when it is ignored.
+     * @param starContribution Star distance blended into the regular distance, in internal units.
+     * @param regularDistance  Distance used when no star is nearby, in internal units.
+     * @param rawDistance      Raw (unsmoothed) distance of the current frame, in internal units.
+     * @param smoothedDistance Smoothed distance, in internal units.
+     * @param speedScale       Current speed scaling, in internal units per second.
+     * @param enabled          Whether the star distance scaling setting is on.
+     * @param mode             Current camera mode.
+     */
+    public record StarDistanceDebug(String starName,
+                                    double radius,
+                                    double starDistance,
+                                    double limitLow,
+                                    double limitHigh,
+                                    double blend,
+                                    double starContribution,
+                                    double regularDistance,
+                                    double rawDistance,
+                                    double smoothedDistance,
+                                    double speedScale,
+                                    boolean enabled,
+                                    CameraMode mode) {
+    }
+
+    /**
+     * Builds a snapshot of the closest-star distance scaling inputs and outputs for the star
+     * distance window.
+     *
+     * @return The snapshot. Never null; the star fields are NaN when there is no closest star.
+     */
+    public StarDistanceDebug starDistanceDebug() {
+        var star = proximity != null ? proximity.effective[0] : null;
+        double radius = Double.NaN;
+        double starDistance = Double.NaN;
+        double low = Double.NaN;
+        double high = Double.NaN;
+        double blend = Double.NaN;
+        double contribution = Double.NaN;
+
+        if (star != null) {
+            radius = star.getRadius();
+            starDistance = star.getClosestDistToCamera() + minDist();
+            low = radius * starDistanceScaleLow;
+            high = radius * starDistanceScaleHigh;
+            blend = starDistanceBlend(starDistance, low, high);
+            contribution = blendStarDistance(starDistance, regularDistance, blend);
+        }
+
+        return new StarDistanceDebug(star != null ? star.getName() : null,
+                                     radius,
+                                     starDistance,
+                                     low,
+                                     high,
+                                     blend,
+                                     contribution,
+                                     regularDistance,
+                                     rawDistance,
+                                     smoothedDistance,
+                                     speedScaling,
+                                     GaiaSky.settings().scene.camera.starDistanceScaling,
+                                     getMode());
     }
 
     private double smoothedDistance = -1;

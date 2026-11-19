@@ -89,6 +89,7 @@ public class MainGui extends AbstractGui {
     protected LoadProgressInterface loadProgressInterface;
     protected LocationInfoInterface locationInfoInterface;
     protected LogWindow logWindow;
+    protected StarDistanceWindow starDistanceWindow;
     protected ProceduralPlanetWindow proceduralPlanetWindow;
     protected DataInfoWindow dataInfoWindow;
     protected ArchiveViewWindow archiveViewWindow;
@@ -139,7 +140,8 @@ public class MainGui extends AbstractGui {
                                         SHOW_ARCHIVE_VIEW_CMD, UPDATE_ARCHIVE_VIEW_CMD, SHOW_PLAYCAMERA_CMD, REMOVE_KEYBOARD_FOCUS_CMD,
                                         REMOVE_GUI_COMPONENT_CMD, ADD_GUI_COMPONENT_CMD, SHOW_LOG_CMD, RA_DEC_UPDATED, LON_LAT_UPDATED,
                                         CONTEXT_MENU_CMD, SHOW_LAND_AT_LOCATION_CMD, DISPLAY_POINTER_COORDS_CMD, MINIMAP_TOGGLE_CMD,
-                                        MINIMAP_DISPLAY_CMD, SHOW_PROCEDURAL_GEN_CMD, SHOW_PROCEDURAL_GALAXY_CMD, CONSOLE_CMD);
+                                        MINIMAP_DISPLAY_CMD, SHOW_PROCEDURAL_GEN_CMD, SHOW_PROCEDURAL_GALAXY_CMD, CONSOLE_CMD,
+                                        SHOW_STAR_DISTANCE_CMD);
     }
 
     protected void buildGui() {
@@ -585,6 +587,13 @@ public class MainGui extends AbstractGui {
                 logWindow.update();
                 if (!logWindow.isVisible() || !logWindow.hasParent())
                     logWindow.show(stage);
+            }
+            case SHOW_STAR_DISTANCE_CMD -> {
+                if (starDistanceWindow == null) {
+                    starDistanceWindow = new StarDistanceWindow(stage, skin);
+                }
+                if (!starDistanceWindow.isVisible() || !starDistanceWindow.hasParent())
+                    starDistanceWindow.show(stage);
             }
             case UPDATE_DATA_INFO_CMD -> {
                 if (dataInfoWindow != null && dataInfoWindow.isVisible() && dataInfoWindow.hasParent()) {
