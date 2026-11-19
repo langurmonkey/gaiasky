@@ -1098,7 +1098,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             gui.dispose();
 
         // Dispose LUT Manager.
-        var lutManager = MaterialComponent.getLUTManager();
+        var lutManager = MaterialComponent.getLUTManager(false);
         if (lutManager != null) {
             lutManager.dispose();
         }

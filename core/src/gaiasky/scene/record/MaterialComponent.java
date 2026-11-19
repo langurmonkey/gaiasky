@@ -61,7 +61,13 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     public static final CubemapComponent sharedReflectionCubemap = new CubemapComponent();
 
     public static BiomeLUTManager getLUTManager() {
-        lutManager.loadAll();
+        return getLUTManager(true);
+    }
+
+    public static BiomeLUTManager getLUTManager(boolean initialize) {
+        if (initialize) {
+            initializeBiomeLUTManager();
+        }
         return lutManager;
     }
 
