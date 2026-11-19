@@ -63,6 +63,13 @@ public class ShadowMapRenderPass extends RenderPass {
     private static boolean DEBUG_UI_VIEW_GLOBAL = false;
     private static final boolean DEBUG_UI_VIEW_LOCAL = false;
     private static final IntSet DEBUG_UI_VIEW_LOCAL_SET = new IntSet();
+    // Log the light camera and the drawn model geometry, for debugging.
+    private static final boolean DEBUG_SHADOW_MAP = false;
+    private int debugFrame = 0;
+    private final Vector3 auxDbg = new Vector3();
+    private static final Matrix4 auxMat = new Matrix4();
+    private final Vector3Q debugObjRel = new Vector3Q();
+    private final Vector3Q debugObjAbs = new Vector3Q();
 
     private Vector3 aux1;
     private Vector3D aux1d, aux2d, aux3d;
@@ -204,7 +211,7 @@ public class ShadowMapRenderPass extends RenderPass {
             cameraLightGlobal.far = (float) FastMath.min(Constants.AU_TO_U, maxDist);
 
             // Update cam
-            cameraLightGlobal.update(false);
+            updateLightCamera(cameraLightGlobal);
 
             // Render model depth map to global frame buffer.
             var fb = globalFrameBuffer == null ? newShadowMapFrameBuffer(null) : globalFrameBuffer;
@@ -248,6 +255,10 @@ public class ShadowMapRenderPass extends RenderPass {
             var distCamCenter = (entitySpan * 2.0 / FastMath.tan(FastMath.toRadians(cameraLightIndividual.fieldOfView)));
             // Position, factor of radius
             Vector3Q objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
+            if (DEBUG_SHADOW_MAP) {
+                debugObjRel.set(objPos).sub(camera.getPos());
+                debugObjAbs.set(objPos);
+            }
             for (int j = 0; j < NUM_SHADOW_CASTING_LIGHTS; j++) {
                 // Light direction depends on light.
                 Vector3 lightDir = aux1;
@@ -274,7 +285,11 @@ public class ShadowMapRenderPass extends RenderPass {
                 cameraLightIndividual.far = (float) (distCamCenter + entitySpan);
 
                 // Update cam
-                cameraLightIndividual.update(false);
+                updateLightCamera(cameraLightIndividual);
+
+                if (DEBUG_SHADOW_MAP && (debugFrame++ % 60) == 0) {
+                    debugShadowMapGeometry(candidate, entitySpan, distCamCenter, camera);
+                }
 
                 // Render model depth map to frame buffer.
                 var fb = scaffolding.shadowMapFb == null ? newShadowMapFrameBuffer(candidate) : scaffolding.shadowMapFb;
@@ -315,6 +330,94 @@ public class ShadowMapRenderPass extends RenderPass {
                 }
             }
         }
+    }
+
+    /**
+     * Logs the light camera, the light direction and the geometry actually drawn into the map, to
+     * find out why the map does not cover the object. Enable with DEBUG_SHADOW_MAP.
+     */
+    private void debugShadowMapGeometry(Entity candidate,
+                                        double entitySpan,
+                                        double distCamCenter,
+                                        ICamera camera) {
+        var mc = Mapper.model.get(candidate).model;
+        var scaffold = Mapper.modelScaffolding.get(candidate);
+        var base = Mapper.base.get(candidate);
+        if (mc == null || mc.instance == null) {
+            return;
+        }
+        mc.instance.transform.getTranslation(auxDbg);
+        double drawnRadius = EntityUtils.getRadius(candidate) * (scaffold != null ? scaffold.sizeScaleFactor : 1);
+
+        var cam = cameraLightIndividual;
+        float[] m = cam.combined.val;
+        double px = auxDbg.x, py = auxDbg.y, pz = auxDbg.z;
+        double cx = m[0] * px + m[4] * py + m[8] * pz + m[12];
+        double cy = m[1] * px + m[5] * py + m[9] * pz + m[13];
+        double cz = m[2] * px + m[6] * py + m[10] * pz + m[14];
+        double cw = m[3] * px + m[7] * py + m[11] * pz + m[15];
+        double uvx = 0.5 + 0.5 * cx / cw;
+        double uvy = 0.5 + 0.5 * cy / cw;
+        double depth = 0.5 + 0.5 * cz / cw;
+        double tanHalf = FastMath.tan(FastMath.toRadians(cam.fieldOfView * 0.5));
+        // Radius of the object in uv units (map edge to edge = 1).
+        double uvR = 0.5 * drawnRadius / (cw * tanHalf);
+
+        // Error between the drawn position and the position the light camera was aimed at.
+        var relD = debugObjRel.tov3d(new Vector3D());
+        double dx = px - relD.x, dy = py - relD.y, dz = pz - relD.z;
+        double posErr = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        // Error between the light direction used and the true sun -> object direction.
+        double dirErrDeg = Double.NaN;
+        var pl = mc.pointLight(0);
+        if (pl != null) {
+            var absD = debugObjAbs.tov3d(new Vector3D());
+            var sunD = new Vector3D(pl.position.x, pl.position.y, pl.position.z).add(new Vector3D(camera.getPos().x.doubleValue(), camera.getPos().y.doubleValue(), camera.getPos().z.doubleValue()));
+            var trueDir = absD.sub(sunD).nor();
+            double dot = Math.max(-1.0, Math.min(1.0, trueDir.x * cam.direction.x + trueDir.y * cam.direction.y + trueDir.z * cam.direction.z));
+            dirErrDeg = FastMath.toDegrees(FastMath.acos(dot));
+        }
+
+        System.out.printf(
+                "[SM] %s span=%.4g dist=%.4g near=%.4g far=%.4g%n"
+                        + "[SM] %s lightPos=(%.4g,%.4g,%.4g) dir=(%.4f,%.4f,%.4f) dirErr=%.4f deg%n"
+                        + "[SM] %s drawnPos=(%.4g,%.4g,%.4g) aimPos=(%.4g,%.4g,%.4g) posErr=%.4g drawnR=%.4g%n"
+                        + "[SM] %s uv=(%.4f,%.4f) uvR=%.4f depth=%.4f%n",
+                base != null ? base.getName() : "?",
+                entitySpan, distCamCenter, cam.near, cam.far,
+                base != null ? base.getName() : "?",
+                cam.position.x, cam.position.y, cam.position.z,
+                cam.direction.x, cam.direction.y, cam.direction.z, dirErrDeg,
+                base != null ? base.getName() : "?",
+                px, py, pz,
+                debugObjRel.x.doubleValue(), debugObjRel.y.doubleValue(), debugObjRel.z.doubleValue(), posErr, drawnRadius,
+                base != null ? base.getName() : "?",
+                uvx, uvy, uvR, depth);
+    }
+
+    /**
+     * Recomputes the view, projection, combined and frustum of a light camera from its position,
+     * direction, up, near, far and field of view.
+     * <p>
+     * Do not use {@link PerspectiveCamera#update(boolean)}: it builds the view matrix with
+     * {@code setToLookAt(position, position + direction, up)}, and since the light cameras sit at
+     * the Sun (a large camera-relative position once the distance scale is raised), the float
+     * addition quantizes the unit direction away. The aim error grows with the distance scale and
+     * reaches 0.28 degrees at 1e4 - more than the half field of view of 0.25 - which moves the
+     * object out of its own shadow map. Building the rotation from the direction itself and
+     * post-translating avoids the cancellation.
+     */
+    private static void updateLightCamera(PerspectiveCamera cam) {
+        cam.view.setToLookAt(cam.direction, cam.up);
+        cam.view.mul(auxMat.setToTranslation(-cam.position.x, -cam.position.y, -cam.position.z));
+        cam.projection.setToProjection(Math.abs(cam.near), Math.abs(cam.far), cam.fieldOfView,
+                cam.viewportWidth / cam.viewportHeight);
+        cam.combined.set(cam.projection);
+        Matrix4.mul(cam.combined.val, cam.view.val);
+        cam.invProjectionView.set(cam.combined);
+        Matrix4.inv(cam.invProjectionView.val);
+        cam.frustum.update(cam.invProjectionView);
     }
 
     private void addCandidates(List<IRenderable> models,
@@ -395,7 +498,7 @@ public class ShadowMapRenderPass extends RenderPass {
                 cameraLightIndividual.far = (float) (distCamCenter + entitySpan);
 
                 // Update cam
-                cameraLightIndividual.update(false);
+                updateLightCamera(cameraLightIndividual);
 
                 // Render model depth map to frame buffer
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
