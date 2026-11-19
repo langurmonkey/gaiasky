@@ -29,6 +29,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.render.api.StubRenderable;
 import gaiasky.render.gdx.IntModelBatch;
+import gaiasky.render.gdx.graphics.DepthOnlyFramebuffer;
 import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.render.process.RenderModeCubemapProjections;
@@ -96,6 +97,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Render lists for all render groups, for full and half resolution.
      **/
     private List<List<IRenderable>> renderListsFull, renderListsHalf;
+    /**
+     * A copy of the full-resolution depth, taken before the atmosphere writes the constant depth of its
+     * shell into the live buffer. The half-resolution pass tests its content against it. Null until the
+     * first frame with an atmosphere; see {@link #snapshotDepth(FrameBuffer)}.
+     */
+    private DepthOnlyFramebuffer depthSnapshot;
     private Map<RenderGroup, IRenderSystem> renderSystems;
     private List<RenderGroup> renderGroups;
     private RenderSystemRunnable depthTestR,
@@ -602,13 +609,49 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
+     * Copies the depth of the given framebuffer into {@link #depthSnapshot}, a depth-only target of
+     * the same size and format. The full-resolution buffer is left bound and its viewport untouched,
+     * so this can be done in the middle of the frame - unlike the half-resolution pass.
+     * <p>
+     * Called while the full-resolution depth still holds geometry only, before the atmosphere writes
+     * the constant depth of its shell into it. The half-resolution pass then tests its content
+     * against this copy, so it is occluded by real geometry and not by the atmosphere.
+     *
+     * @param fullBuffer The full-resolution buffer, currently bound.
+     */
+    private void snapshotDepth(FrameBuffer fullBuffer) {
+        int w = fullBuffer.getWidth();
+        int h = fullBuffer.getHeight();
+        if (depthSnapshot != null && (depthSnapshot.width != w || depthSnapshot.height != h)) {
+            // Resized: a blit needs both sides to match.
+            depthSnapshot.dispose();
+            depthSnapshot = null;
+        }
+        if (depthSnapshot == null) {
+            depthSnapshot = new DepthOnlyFramebuffer(w, h);
+        }
+        Gdx.gl.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, fullBuffer.getFramebufferHandle());
+        Gdx.gl.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, depthSnapshot.framebufferHandle);
+        GL30.glBlitFramebuffer(0, 0, w, h,
+                               0, 0, w, h,
+                               GL20.GL_DEPTH_BUFFER_BIT, GL20.GL_NEAREST);
+        // Keep drawing into the full-resolution buffer.
+        Gdx.gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fullBuffer.getFramebufferHandle());
+    }
+
+    /**
      * Draws everything routed to the half-resolution buffer (renderables flagged with
      * {@code halfResolutionBuffer}) into that buffer, and goes back to the full-resolution one.
      * <p>
-     * The half-resolution buffer is cleared and given a copy of the full-resolution depth, so that its
-     * content is occluded by full-resolution geometry. This has to run while the full-resolution depth
-     * still holds only geometry, i.e. before the atmosphere stamps its own depth into it - see the
-     * caller in {@code renderScene}.
+     * The half-resolution buffer is cleared and given a copy of the depth of the geometry, so that its
+     * content is occluded by full-resolution geometry. That copy is {@code depthSnapshot} when there was
+     * an atmosphere in the frame - it holds no synthetic shell depth - and the full-resolution buffer
+     * itself otherwise.
+     * <p>
+     * It runs at the end of the frame. Unbinding the full-resolution buffer in the middle of the frame,
+     * with the scene half-drawn in it, is not reliable: on macOS the elements drawn after the pass lost
+     * their depth range. Only the depth blit that {@link #snapshotDepth(FrameBuffer)} does may happen
+     * mid-frame.
      *
      * @param camera                 The camera.
      * @param t                      The session time, in seconds.
@@ -622,13 +665,20 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                           FrameBuffer fullBuffer,
                                           FrameBuffer halfBuffer,
                                           boolean halfResolutionContent,
+                                          boolean depthSnapshotTaken,
                                           RenderingContext renderContext) {
         fullBuffer.end();
         try {
             halfBuffer.begin();
             clearScreen();
             if (halfResolutionContent) {
-                blitDepth(fullBuffer, halfBuffer);
+                if (depthSnapshotTaken && depthSnapshot != null) {
+                    // The depth of the geometry only, taken before the atmosphere stamped its shell into
+                    // the live buffer: see snapshotDepth(). Same format, so it blits directly.
+                    blitDepth(depthSnapshot.framebufferHandle, depthSnapshot.width, depthSnapshot.height, halfBuffer);
+                } else {
+                    blitDepth(fullBuffer, halfBuffer);
+                }
             }
             for (var renderGroup : renderGroups) {
                 List<IRenderable> l = renderListsHalf.get(renderGroup.ordinal());
@@ -727,22 +777,18 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             var fullBuffer = pp.getCombinedBuffer().getFullBuffer();
             var halfBuffer = pp.getCombinedBuffer().getHalfBuffer();
             boolean halfResolutionContent = hasHalfResolutionContent();
-            // Only an atmosphere forces the pass to run early: its synthetic shell depth is the one thing the
-            // pass must not be depth-tested or composited against. Without one, the pass keeps running at the
-            // end of the frame, where it sees everything the frame drew.
+            // An atmosphere writes a depth into the frame that is not geometry: a constant distance for the
+            // motion blur, shared by every pixel of the shell. The half-resolution pass must not test its
+            // content against that, so the depth it copies is snapshotted before the atmosphere is drawn.
             var atmosphereList = renderListsFull.get(MODEL_ATM.ordinal());
             boolean atmosphereInFrame = atmosphereList != null && !atmosphereList.isEmpty();
-            boolean halfPassDone = false;
+            boolean depthSnapshotTaken = false;
             for (var renderGroup : renderGroups) {
-                if (!halfPassDone && atmosphereInFrame && renderGroup == MODEL_ATM) {
-                    // The half-resolution pass has to run before the atmosphere. The atmosphere writes a
-                    // depth that is not geometry - a constant at the radius of its shell, for the motion
-                    // blur - and everything that reads the scene depth after it would take that depth for
-                    // an occluder a few thousand kilometres away: the ray clip of a volume drawn in the
-                    // half-resolution pass, and the composite of the full- and half-resolution buffers.
-                    // Running the pass here means the depth it copies holds real geometry only.
-                    renderHalfResolutionPass(camera, t, fullBuffer, halfBuffer, halfResolutionContent, renderContext);
-                    halfPassDone = true;
+                if (!depthSnapshotTaken && halfResolutionContent && atmosphereInFrame && renderGroup == MODEL_ATM) {
+                    // A depth-only blit into our own target: the full-resolution buffer stays bound, so the
+                    // frame is not interrupted while it is half-drawn.
+                    snapshotDepth(fullBuffer);
+                    depthSnapshotTaken = true;
                 }
                 List<IRenderable> l = renderListsFull.get(renderGroup.ordinal());
                 if (l != null && !l.isEmpty()) {
@@ -754,11 +800,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 }
             }
 
-            // No atmosphere in the frame, so the pass can run at the end: nothing has written a synthetic
-            // depth for it to pick up.
-            if (!halfPassDone) {
-                renderHalfResolutionPass(camera, t, fullBuffer, halfBuffer, halfResolutionContent, renderContext);
-            }
+            // The pass always runs at the end of the frame, once the scene is complete: it is the only
+            // place that unbinds the full-resolution buffer mid-frame.
+            renderHalfResolutionPass(camera, t, fullBuffer, halfBuffer, halfResolutionContent, depthSnapshotTaken, renderContext);
 
         } catch (GdxRuntimeException | ShaderCompilationException gre) {
             // Escalate.
@@ -1074,6 +1118,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // Dispose render passes.
         if (renderPasses != null) {
             renderPasses.forEach(Disposable::dispose);
+        }
+
+        // Dispose the depth snapshot.
+        if (depthSnapshot != null) {
+            depthSnapshot.dispose();
+            depthSnapshot = null;
         }
 
     }

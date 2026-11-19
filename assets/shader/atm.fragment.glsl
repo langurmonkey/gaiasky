@@ -45,9 +45,9 @@ void main(void) {
     //
     // The centre is behind every point of the planet's visibile disc and of the cloud deck at any
     // altitude, and in front of the far plane, so this reproduces the scale-1 behaviour everywhere.
-    // Still constant per body, and still a depth that is not geometry: the half-resolution pass is
-    // drawn before this shader runs (SceneRenderer#renderHalfResolutionPass), and the full/half
-    // composite judges the full-resolution side by the half-resolution depth.
+    // Still constant per body, and still a depth that is not geometry: the half-resolution pass copies
+    // the scene depth into a snapshot of its own before this shader runs
+    // (SceneRenderer#snapshotDepth) and tests its content against that copy.
     gl_FragDepth = getDepthValue(u_depthDist, u_cameraNearFar.y, u_cameraK);
 
     #ifdef ssrFlag
