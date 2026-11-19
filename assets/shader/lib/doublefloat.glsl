@@ -6,6 +6,18 @@
 // Based on the Fortran single-double package
 // http://crd.lbl.gov/~dhbailey/mpdist/
 
+// Barrier macro. The error-free transformations below rely on the compiler
+// NOT reassociating the arithmetic, e.g. t2 - (dsc.x - t1) becomes 0 if it
+// can prove dsc.x == t1 + t2, collapsing the pair to plain float. Some
+// drivers (Apple/Metal in particular) do exactly that. An int round-trip is
+// bit-identical but opaque, so the relationship is lost to the optimiser.
+// This is a no-op numerically; define DS_NO_BARRIER to disable it.
+#ifdef DS_NO_BARRIER
+#define DSB(x) (x)
+#else
+#define DSB(x) intBitsToFloat(floatBitsToInt(x))
+#endif
+
 // Setting
 vec2 ds(float a) {
     return vec2(a, 0.0);
@@ -36,10 +48,10 @@ vec2 ds_add(vec2 dsa, vec2 dsb) {
     float t1, t2, e;
 
     t1 = dsa.x + dsb.x;
-    e = t1 - dsa.x;
-    t2 = ((dsb.x - e) + (dsa.x - (t1 - e))) + dsa.y + dsb.y;
+    e = DSB(t1 - dsa.x);
+    t2 = DSB(((dsb.x - e) + (dsa.x - (t1 - e))) + dsa.y + dsb.y);
 
-    dsc.x = t1 + t2;
+    dsc.x = DSB(t1 + t2);
     dsc.y = t2 - (dsc.x - t1);
     return dsc;
 }
@@ -50,10 +62,10 @@ vec2 ds_sub (vec2 dsa, vec2 dsb) {
     float e, t1, t2;
 
     t1 = dsa.x - dsb.x;
-    e = t1 - dsa.x;
-    t2 = ((-dsb.x - e) + (dsa.x - (t1 - e))) + dsa.y - dsb.y;
+    e = DSB(t1 - dsa.x);
+    t2 = DSB(((-dsb.x - e) + (dsa.x - (t1 - e))) + dsa.y - dsb.y);
 
-    dsc.x = t1 + t2;
+    dsc.x = DSB(t1 + t2);
     dsc.y = t2 - (dsc.x - t1);
     return dsc;
 }
@@ -72,16 +84,16 @@ vec2 ds_mul(vec2 dsa, vec2 dsb) {
     a2 = dsa.x - a1;
     b2 = dsb.x - b1;
 
-    c11 = dsa.x * dsb.x;
+    c11 = DSB(dsa.x * dsb.x);
     c21 = a2 * b2 + (a2 * b1 + (a1 * b2 + (a1 * b1 - c11)));
 
     c2 = dsa.x * dsb.y + dsa.y * dsb.x;
 
-    t1 = c11 + c2;
+    t1 = DSB(c11 + c2);
     e = t1 - c11;
     t2 = dsa.y * dsb.y + ((c2 - e) + (c11 - (t1 - e))) + c21;
 
-    dsc.x = t1 + t2;
+    dsc.x = DSB(t1 + t2);
     dsc.y = t2 - (dsc.x - t1);
 
     return dsc;
@@ -110,19 +122,19 @@ vec2 ds_div(vec2 dsa, vec2 dsb) {
     b2 = dsb.x - b1;
 
     // Multiply s1 * dsb(1) using Dekker's method.
-    c11 = s1 * dsb.x;
+    c11 = DSB(s1 * dsb.x);
     c21 = (((a1 * b1 - c11) + a1 * b2) + a2 * b1) + a2 * b2;
 
     // Compute s1 * dsb(2) (only high-order word is needed).
     c2 = s1 * dsb.y;
 
     // Compute (c11, c21) + c2 using Knuth's trick.
-    t1 = c11 + c2;
+    t1 = DSB(c11 + c2);
     e = t1 - c11;
     t2 = ((c2 - e) + (c11 - (t1 - e))) + c21;
 
     //   The result is t1 + t2, after normalization.
-    t12 = t1 + t2;
+    t12 = DSB(t1 + t2);
     t22 = t2 - (t12 - t1);
 
     //   Compute dsa - (t12, t22) using Knuth's trick.
@@ -134,7 +146,7 @@ vec2 ds_div(vec2 dsa, vec2 dsb) {
     s2 = (t11 + t21) / dsb.x;
 
     //   The result is s1 + s2, after normalization.
-    dsc.x = s1 + s2;
+    dsc.x = DSB(s1 + s2);
     dsc.y = s2 - (dsc.x - s1);
 
     return dsc;
