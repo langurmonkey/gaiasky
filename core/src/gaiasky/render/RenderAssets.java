@@ -53,7 +53,8 @@ public class RenderAssets {
     public ExtShaderProgram[] billboardShaders, billboardStarShaders, billboardStarDepthShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders,
             lineQuadCpuShaders, lineQuadGpuShaders,
             primitiveGpuShaders, billboardGroupShaders, billboardProceduralShaders, billboardProceduralCpuShaders, particleStreakShaders, particleGroupShaders,
-            particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, orbitElemShaders;
+            particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, orbitElemShaders,
+            orbitElemGpuShaders;
     public IntModelBatch mbSimple, mbSimpleAdditive, mbVertexDiffuse, mbSimpleThruster,
             mbSimpleGrid, mbSimpleRecGrid, mbPBR, mbPBRDust, mbPBRDepth, mbPBROpaque,
             mbPBRSvtDetection, mbPBRTessellation, mbPBRTessellationProcedural, mbPBRTessellationOpaque, mbPBRTessellationSvtDetection,
@@ -62,7 +63,7 @@ public class RenderAssets {
     public BitmapFont fontDistanceField;
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc,
-            variableGroupDesc, particleStreakDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc,
+            variableGroupDesc, particleStreakDesc, orbitElemDesc, orbitElemGpuDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc,
             billboardGroupDesc, billboardProceduralDesc, billboardProceduralCpuDesc, billboardStarDesc, billboardStarDepthDesc, galDesc, spriteDesc,
             billboardDesc;
 
@@ -193,6 +194,17 @@ public class RenderAssets {
                                       "shader/particle.group.quad.fragment.glsl",
                                       TextUtils.concatAll("orbitelem", names),
                                       defines);
+        // Same source, compiled with the vertex shader solving the orbits. It gets the double-float
+        // helpers without their optimization barrier: this path recomputes every position from
+        // scratch on every frame, so the barrier buys nothing and costs a lot. Both variants are
+        // always compiled, like the tessellation programs, so that the path can be chosen after
+        // this point: the setting is read when a mesh is built, not here.
+        orbitElemGpuDesc = loadShaderExt(manager,
+                                         "shader/particle.group.elements.quad.vertex.glsl",
+                                         "shader/particle.group.quad.fragment.glsl",
+                                         TextUtils.concatAll("orbitelem.gpu", names),
+                                         defines,
+                                         "#define DS_NO_BARRIER\n#define elementsGpuPath");
         // Initialize point cloud shaders
         particleGroupDesc = loadShaderExt(manager,
                                           "shader/particle.group.quad.vertex.glsl",
@@ -421,6 +433,11 @@ public class RenderAssets {
          * ORBITAL ELEMENTS PARTICLES - default and relativistic
          */
         orbitElemShaders = fetchShaderProgramExt(manager, orbitElemDesc, TextUtils.concatAll("orbitelem", names));
+
+        /*
+         * ORBITAL ELEMENTS GROUP, GPU PATH - default and relativistic
+         */
+        orbitElemGpuShaders = fetchShaderProgramExt(manager, orbitElemGpuDesc, TextUtils.concatAll("orbitelem.gpu", names));
 
         // Per-vertex lighting shaders
         IntShaderProvider simple = manager.get("simple");

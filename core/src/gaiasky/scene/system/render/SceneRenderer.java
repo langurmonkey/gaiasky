@@ -397,7 +397,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case ORBITAL_ELEMENTS_GROUP -> {
-                system = new ElementsSetRenderer(this, ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
+                system = new ElementsSetRenderer(this, ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders,
+                                                 renderAssets.orbitElemGpuShaders);
                 // Blending controlled by shadingType in the renderer.
 
             }

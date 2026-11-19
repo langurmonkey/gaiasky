@@ -6,29 +6,57 @@
 uniform mat4 u_projView;
 uniform vec3 u_camUp;
 uniform float u_alpha;
-// Base dataset position (comes from parent position)
+// Dataset origin, camera-relative. Only used for the fake lighting.
 uniform vec3 u_datasetPos;
 uniform float u_sizeFactor;
-uniform mat4 u_refSysTransform;
 uniform vec2 u_sizeLimits;
-// Current julian date, in days, emulates a double in vec2
-uniform vec2 u_t;
 // VR scale factor
 uniform float u_vrScale;
-// Arbitrary affine transformation(s)
-uniform bool u_transformFlag = false;
-uniform mat4 u_transform;
 
 // INPUT
 // Regular attributes
 layout(location = 0) in vec4 a_position;
 layout(location = 1) in vec2 a_texCoord0;
+
+/*
+ * There are two ways to place the elements of the group, selected by the elementsGpuPath define.
+ *
+ * GPU (default everywhere except macOS): the orbital elements are uploaded once and Kepler's
+ * equation is solved here, in the vertex shader, for the current time. The mean anomaly is
+ * accumulated in emulated double precision to keep the reduced anomaly accurate over long spans,
+ * the solve and the rotation that follows stay in single precision. The double-float helpers are
+ * compiled without their optimization barrier (DS_NO_BARRIER), which is what makes this path fast.
+ * It recomputes each position from scratch on every frame, which some drivers (macOS) cannot keep
+ * stable, and the elements visibly jitter there.
+ *
+ * CPU: the position arrives ready, camera-relative and in internal units, computed in double
+ * precision in ElementPositions. This shader only expands the billboard.
+ */
+#ifdef elementsGpuPath
+#include <shader/lib/doublefloat.glsl>
+// Current julian date, in days, emulates a double in vec2
+uniform vec2 u_t;
+// Inverse reference-system transform of the dataset
+uniform mat4 u_refSysTransform;
+// Arbitrary affine transformation(s)
+uniform bool u_transformFlag = false;
+uniform mat4 u_transform;
 // Instanced attributes
 layout(location = 2) in vec4 a_color;
 layout(location = 3) in vec4 a_orbitelems01;
 layout(location = 4) in vec4 a_orbitelems02;
 layout(location = 5) in float a_size;
 layout(location = 6) in float a_textureIndex;
+#else
+// Instanced attributes
+layout(location = 2) in vec4 a_color;
+// Camera-relative position of the element, in internal units. Computed on the CPU in
+// double precision (see ElementPositions), so that Kepler's equation, the reference
+// system transform and the dataset origin never touch a float intermediate.
+layout(location = 3) in vec3 a_pos;
+layout(location = 4) in float a_size;
+layout(location = 5) in float a_textureIndex;
+#endif
 
 // OUTPUT
 out vec4 v_col;
@@ -46,106 +74,16 @@ out float v_textureIndex;
 #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
+#ifdef elementsGpuPath
 #define KM_TO_U 1e-6
 #define D_TO_S 86400.0
 
-// ---------------------------------------------------------------------------
-// Orbital mechanics in double-float. The time -> mean anomaly stage runs in
-// double-float in both paths; the camera-relative path also runs Kepler's
-// equation, the trig and the reference-system transform in double-float.
-// ---------------------------------------------------------------------------
-#include <shader/lib/doublefloat.glsl>
-#include <shader/lib/doublefloat.trig.glsl>
-
-// Mean anomaly (rad) in double-float, for the current time and this particle's
-// orbital elements.
-vec2 meanAnomaly() {
-    float period = a_orbitelems01.x;
-    float epoch = a_orbitelems01.y;
-    float M0 = a_orbitelems02.w;
-    vec2 deltat;
-    if (epoch == 0.0) {
-        // Epoch is start-of-time; u_t is already "time since epoch".
-        deltat = u_t;
-    } else {
-        deltat = ds_sub(u_t, ds_set(epoch));
-    }
-    return ds_meanAnomaly(deltat, period, M0);
-}
-
-// Camera-relative position (internal units). Everything down to the last
-// addition is computed in double-float; the result collapses once at the end.
-vec3 keplerToCameraRelativeDS() {
-    float a = a_orbitelems01.z;
-    float e = a_orbitelems01.w;
-    float i = a_orbitelems02.x;
-    float raan = a_orbitelems02.y;
-    float argp = a_orbitelems02.z;
-
-    vec2 M_d = meanAnomaly();
-
-    // Kepler's equation: float seed, then two Newton steps in double-float
-    float M = M_d.x;
-    float E = (e < 0.8) ? M : PI;
-    for (int it = 0; it < 100; ++it) {
-        float f = E - e * sin(E) - M;
-        float dE = -f / (1.0 - e * cos(E));
-        E += dE;
-        if (abs(dE) < 1e-7) break;
-    }
-    vec2 Ed = ds_set(E);
-    vec2 cE, sE;
-    for (int it = 0; it < 2; ++it) {
-        ds_sinCos(Ed, cE, sE);
-        vec2 f = ds_sub(ds_sub(Ed, ds_mul(ds_set(e), sE)), M_d);
-        Ed = ds_sub(Ed, ds_set(f.x / (1.0 - e * cE.x)));
-    }
-    ds_sinCos(Ed, cE, sE);
-
-    // Perifocal coordinates (km)
-    vec2 xpf = ds_mul(ds_set(a), ds_sub(cE, ds_set(e)));
-    vec2 ypf = ds_mul(ds_set(a * sqrt(1.0 - e * e)), sE);
-
-    float cosO = cos(raan);
-    float sinO = sin(raan);
-    float cosI = cos(i);
-    float sinI = sin(i);
-    float cosW = cos(argp);
-    float sinW = sin(argp);
-    // Rotation columns; position = vec3(xpf, ypf, 0) * R
-    vec3 c0 = vec3(cosO * cosW - sinO * sinW * cosI, -cosO * sinW - sinO * cosW * cosI, sinO * sinI);
-    vec3 c1 = vec3(sinO * cosW + cosO * sinW * cosI, -sinO * sinW + cosO * cosW * cosI, -cosO * sinI);
-    vec3 c2 = vec3(sinW * sinI, cosW * sinI, cosI);
-    vec2 px = ds_add(ds_mul(xpf, ds_set(c0.x)), ds_mul(ypf, ds_set(c0.y)));
-    vec2 py = ds_add(ds_mul(xpf, ds_set(c1.x)), ds_mul(ypf, ds_set(c1.y)));
-    vec2 pz = ds_add(ds_mul(xpf, ds_set(c2.x)), ds_mul(ypf, ds_set(c2.y)));
-
-    // .yzx, km -> internal units
-    vec2 sc = ds_set(KM_TO_U * u_vrScale);
-    vec2 v0 = ds_mul(py, sc);
-    vec2 v1 = ds_mul(pz, sc);
-    vec2 v2 = ds_mul(px, sc);
-
-    // vec4(v, 1) * u_refSysTransform: result[j] = dot(v, column j)
-    vec2 r[3];
-    for (int j = 0; j < 3; ++j) {
-        vec4 col = u_refSysTransform[j];
-        vec2 acc = ds_add(ds_mul(v0, ds_set(col.x)), ds_mul(v1, ds_set(col.y)));
-        acc = ds_add(acc, ds_mul(v2, ds_set(col.z)));
-        acc = ds_add(acc, ds_set(col.w));
-        r[j] = acc;
-    }
-
-    // + u_datasetPos (camera-relative origin of the dataset), collapsed to float
-    vec3 pos;
-    pos.x = ds_add(r[0], ds_set(u_datasetPos.x)).x;
-    pos.y = ds_add(r[1], ds_set(u_datasetPos.y)).x;
-    pos.z = ds_add(r[2], ds_set(u_datasetPos.z)).x;
-    return pos;
-}
-
 // see https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
 vec4 keplerToCartesian() {
+    // Period (d)
+    float period = a_orbitelems01.x;
+    // Epoch (jd)
+    float epoch = a_orbitelems01.y;
     // Semi-major axis (km)
     float a = a_orbitelems01.z;
     // Eccentricity
@@ -156,18 +94,42 @@ vec4 keplerToCartesian() {
     float raan = a_orbitelems02.y;
     // Argument of periapsis (rad)
     float argp = a_orbitelems02.z;
+    // Mean anomaly at epoch (rad)
+    float M0 = a_orbitelems02.w;
 
-    // Mean anomaly: only the time stage is double-float here
-    float M = meanAnomaly().x;
+    // Mean motion (rad/day)
+    float n = PI2 / period;
 
-    // Solve Kepler's equation: M = E - e * sin(E)
+    // Time since epoch, in days (double, emulated)
+    vec2 deltat_d;
+    if (epoch == 0.0) {
+        // A: epoch is start-of-time; u_t is already "time since epoch".
+        deltat_d = u_t;
+    } else {
+        deltat_d = ds_add(u_t, ds_set(-epoch));
+    }
+
+    // Mean anomaly: accumulate in double, reduce mod 2π in double,
+    // then convert to float. This is the key precision step.
+    // First reduce deltat modulo the orbital period (in double): M is
+    // exactly periodic in `period`, so this is equivalent, but it keeps
+    // n * deltat small so that the single-precision rounding error of n
+    // (~2e-7 relative) is not amplified over large time spans (JD ~ 2.5e6 d
+    // would otherwise produce errors of several radians).
+    vec2 deltat_p = ds_mod(deltat_d, period);
+    vec2 nd = ds_mul(deltat_p, ds_set(n));      // n * deltat, double
+    vec2 M_d = ds_add(ds_set(M0), nd);
+    M_d = ds_mod(M_d, PI2);
+    float M = M_d.x;                            // now in [0, 2π), float-exact
+
+    // Solve Kepler’s equation: M = E - e * sin(E)
     float E = (e < 0.8) ? M : PI;
     for (int i = 0; i < 100; ++i) { // Newton-Raphson iteration
         float f = E - e * sin(E) - M;
         float fPrime = 1.0 - e * cos(E);
         float dE = -f / fPrime;
         E += dE;
-        if (abs(dE) < 1e-7) break;
+        if (abs(dE) < 1e-10) break;
     }
 
     // True anomaly
@@ -178,9 +140,10 @@ vec4 keplerToCartesian() {
     // Distance
     float r = a * (1.0 - e * cos(E));
 
-    // Perifocal coordinates (km)
+    // Perifocal coordinates.
     float xpf = r * cos(nu);
     float ypf = r * sin(nu);
+    float zpf = 0.0;
 
     float cosO = cos(raan);
     float sinO = sin(raan);
@@ -201,20 +164,29 @@ vec4 keplerToCartesian() {
                 cosI)
         );
 
-    vec3 position = vec3(xpf, ypf, 0.0) * R;
+    vec3 position = vec3(xpf, ypf, zpf) * R;
 
+    // KM_TO_U is the internal unit per kilometre at the default distance scale factor; u_vrScale
+    // carries the scale factor itself, so the product is Constants.KM_TO_U.
     return vec4(position.yzx * KM_TO_U * u_vrScale, 1.0);
 }
+#endif // elementsGpuPath
 
 void main() {
-    // Particle position relative to camera.
-    vec3 pos;
+#ifdef elementsGpuPath
+    // Compute position for current time from orbital elements
+    vec4 pos4;
     if (u_transformFlag) {
-        pos = (u_transform * (keplerToCartesian() * u_refSysTransform)).xyz + u_datasetPos;
+        pos4 = u_transform * (keplerToCartesian() * u_refSysTransform);
     } else {
-        // Already includes u_datasetPos; collapsed from double-float inside.
-        pos = keplerToCameraRelativeDS();
+        pos4 = keplerToCartesian() * u_refSysTransform;
     }
+    // Particle position relative to camera.
+    vec3 pos = pos4.xyz + u_datasetPos;
+#else
+    // Particle position relative to camera.
+    vec3 pos = a_pos;
+#endif // elementsGpuPath
 
     // Distance to point.
     float dist = length(pos);

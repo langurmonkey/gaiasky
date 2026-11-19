@@ -97,6 +97,24 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     }
 
     /**
+     * Drops every mesh together with the per-renderable bookkeeping that points into them, so that
+     * the next frame rebuilds everything from scratch. Used when the layout of the vertices has to
+     * change, which cannot be done on a mesh that already exists.
+     */
+    protected void resetMeshes() {
+        clearMeshes();
+        if (offsets != null) {
+            offsets.clear();
+        }
+        if (counts != null) {
+            counts.clear();
+        }
+        if (inGpu != null) {
+            inGpu.clear();
+        }
+    }
+
+    /**
      * Clears the mesh data at the index i
      *
      * @param i The index of the mesh data to remove
@@ -332,8 +350,12 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         public static final int ObjectPosition = 8192;
         public static final int ProperMotion = 16384;
         public static final int Additional = 20000;
+        /** Orbital elements, first half: period, epoch, semi-major axis, eccentricity. **/
         public static final int OrbitElems1 = 21000;
+        /** Orbital elements, second half: inclination, ascending node, arg. of pericenter, mean anomaly. **/
         public static final int OrbitElems2 = 22000;
+        /** Camera-relative element position, computed on the CPU. **/
+        public static final int OrbitPos = 23000;
     }
 
 

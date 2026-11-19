@@ -15,10 +15,21 @@
 // u_dsBarrier is deliberately never set by the application: an unset uniform is
 // 0, so the round trip is the identity at runtime while staying opaque to the
 // optimizer. Do not remove, and do not bind it.
+// The orbital elements shader opts out with DS_NO_BARRIER, because it relies on
+// the compiler contracting the error-free transformations to recover the speed
+// of the pre-barrier code. That is safe there and only there: it does not use
+// these transforms to keep a position stable over long time spans, it starts
+// from scratch on every vertex.
+#ifndef DS_NO_BARRIER
 uniform int u_dsBarrier = 0;
 float ds_hb(float x) {
     return intBitsToFloat(floatBitsToInt(x) + u_dsBarrier);
 }
+#else
+float ds_hb(float x) {
+    return x;
+}
+#endif
 
 // Setting
 vec2 ds(float a) {

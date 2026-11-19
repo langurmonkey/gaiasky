@@ -66,7 +66,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     public static class InstancedModel {
         // Attribute offsets.
         public int sizeOffset, particlePosOffset, properMotionOffset, textureIndexOffset, additionalOffset,
-                nVariOffset, varIndexOffset, elems01Offset, elems02Offset;
+                nVariOffset, varIndexOffset, elemPosOffset, elems01Offset, elems02Offset;
         /** Number of vertices. **/
         public int numVertices;
         /** Vertex size in floats (4-bytes). **/
@@ -441,6 +441,17 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      *
      * @return The vertex attributes array.
      */
+    /**
+     * Whether the per-instance data of this system is rewritten every frame. When it is, the
+     * instance buffer is allocated as dynamic so that repeated uploads do not go through a
+     * buffer created for static data.
+     *
+     * @return True if the instance data changes every frame.
+     */
+    protected boolean isDynamicInstanceData() {
+        return false;
+    }
+
     protected VertexAttribute[] buildAttributesDivisor1(int primitive) {
         Array<VertexAttribute> attributes = new Array<>();
         addAttributesDivisor1(attributes, primitive);
@@ -449,6 +460,17 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         for (int i = 0; i < attributes.size; i++)
             array[i] = attributes.get(i);
         return array;
+    }
+
+    /**
+     * Builds the per-instance attributes that are rewritten on every frame. They get a buffer of
+     * their own, so a per-frame update only uploads them and leaves the rest of the instance data
+     * alone. Returns null, which is the common case, when the system has none.
+     *
+     * @return The attributes, or null.
+     */
+    protected VertexAttribute[] buildAttributesDynamic() {
+        return null;
     }
 
     /**
@@ -516,7 +538,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         VertexAttribute[] attributes0 = buildAttributesDivisor0(modelFile == null && modelType.isQuad() ? 2 : 3, modelFile != null,
                                                                 !isWireframe(primitive));
         VertexAttribute[] attributes1 = buildAttributesDivisor1(primitive);
-        curr.mesh = new IntMesh(true, maxVerts, maxInstances, maxIndices, attributes0, attributes1);
+        VertexAttribute[] attributesDynamic = buildAttributesDynamic();
+        curr.mesh = new IntMesh(!isDynamicInstanceData(), maxVerts, maxInstances, maxIndices, attributes0, attributes1, attributesDynamic);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.instanceSize = curr.mesh.getInstanceAttributes().vertexSize / 4;

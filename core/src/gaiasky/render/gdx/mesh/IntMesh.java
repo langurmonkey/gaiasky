@@ -125,8 +125,32 @@ public class IntMesh implements Disposable {
                    int maxIndices,
                    VertexAttribute[] attributes,
                    VertexAttribute[] attributesInstanced) {
+        this(isStatic, maxVertices, maxInstances, maxIndices, attributes, attributesInstanced, null);
+    }
+
+    /**
+     * Creates a new instanced Mesh with an extra group of per-instance attributes that is
+     * rewritten on every frame and kept in a buffer of its own.
+     *
+     * @param isStatic            whether the global and instance vertex data are static.
+     * @param maxVertices         the maximum number of vertices this mesh can hold.
+     * @param maxInstances        the maximum number of instances this mesh can hold.
+     * @param maxIndices          the maximum number of indices this mesh can hold.
+     * @param attributes          the global {@link VertexAttribute}s.
+     * @param attributesInstanced the per-instance attributes that rarely change.
+     * @param attributesDynamic   the per-instance attributes that change every frame, or null.
+     */
+    public IntMesh(boolean isStatic,
+                   int maxVertices,
+                   int maxInstances,
+                   int maxIndices,
+                   VertexAttribute[] attributes,
+                   VertexAttribute[] attributesInstanced,
+                   VertexAttribute[] attributesDynamic) {
         this.isInstanced = maxInstances > 0;
-        this.vertices = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributes), maxInstances, new VertexAttributes(attributesInstanced));
+        this.vertices = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributes), maxInstances,
+                                         new VertexAttributes(attributesInstanced),
+                                         attributesDynamic != null ? new VertexAttributes(attributesDynamic) : null);
         if (maxIndices > 0) {
             this.indices = new IntIndexBufferObject(isStatic, maxIndices);
         } else {
@@ -386,8 +410,17 @@ public class IntMesh implements Disposable {
                                            VertexAttributes attributesGlobal,
                                            int verticesInstance,
                                            VertexAttributes attributesInstance) {
+        return makeVertexBuffer(isStatic, verticesGlobal, attributesGlobal, verticesInstance, attributesInstance, null);
+    }
+
+    private IntVertexData makeVertexBuffer(boolean isStatic,
+                                           int verticesGlobal,
+                                           VertexAttributes attributesGlobal,
+                                           int verticesInstance,
+                                           VertexAttributes attributesInstance,
+                                           VertexAttributes attributesDynamic) {
         if (Gdx.gl30 != null) {
-            return new VertexBufferObjectInstanced(isStatic, verticesGlobal, attributesGlobal, verticesInstance, attributesInstance);
+            return new VertexBufferObjectInstanced(isStatic, verticesGlobal, attributesGlobal, verticesInstance, attributesInstance, attributesDynamic);
         } else {
             throw new RuntimeException("Instanced rendering requires OpenGL 3.0+");
         }
@@ -539,6 +572,20 @@ public class IntMesh implements Disposable {
                                    int offset,
                                    int count) {
         ((VertexBufferObjectInstanced) this.vertices).setInstance(instance, offset, count);
+    }
+
+    /**
+     * Sets the per-frame instance attributes of this Mesh. They live in a buffer of their own, so
+     * uploading them does not touch the rest of the instance data.
+     *
+     * @param dynamic The attributes.
+     * @param offset  The offset, in floats.
+     * @param count   The number of floats to use.
+     */
+    public void setDynamicAttribs(float[] dynamic,
+                                  int offset,
+                                  int count) {
+        ((VertexBufferObjectInstanced) this.vertices).setDynamic(dynamic, offset, count);
     }
 
     /**
@@ -935,6 +982,25 @@ public class IntMesh implements Disposable {
 
     public VertexAttribute getInstancedAttribute(int usage) {
         VertexAttributes attributes = ((VertexBufferObjectInstanced) vertices).getInstanceAttributes();
+        int len = attributes.size();
+        for (int i = 0; i < len; i++)
+            if (attributes.get(i).usage == usage)
+                return attributes.get(i);
+
+        return null;
+    }
+
+    /**
+     * Returns the per-frame instance attribute with the given usage, if any.
+     *
+     * @param usage The usage, one of {@link VertexAttributes.Usage} or one of the custom usages.
+     * @return The attribute, or null if this mesh has no dynamic attribute with that usage.
+     */
+    public VertexAttribute getDynamicAttribute(int usage) {
+        VertexAttributes attributes = ((VertexBufferObjectInstanced) vertices).getDynamicAttributes();
+        if (attributes == null) {
+            return null;
+        }
         int len = attributes.size();
         for (int i = 0; i < len; i++)
             if (attributes.get(i).usage == usage)

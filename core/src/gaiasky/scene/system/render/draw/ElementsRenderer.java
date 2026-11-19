@@ -7,6 +7,7 @@
 
 package gaiasky.scene.system.render.draw;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -34,6 +35,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4D;
+import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -46,21 +48,32 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     protected static final Log logger = Logger.getLogger(ElementsRenderer.class);
 
     private final Vector3 aux1;
-    private final Matrix4 maux, refSysTransformF;
+    private final Matrix4D refSysTransformD, auxTransformD;
     private int posOffset;
     private int uvOffset;
-    private int elems01Offset;
-    private int elems02Offset;
+    private int elemPosOffset;
     private int sizeOffset;
     private int textureIndexOffset;
     private boolean forceAdd = false;
     private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.05)), FastMath.tan(Math.toRadians(1.0))};
 
+    /** Elements of the mesh currently in the GPU, in vertex order. **/
+    private Object[] src;
+    private int srcCount;
+    /** Compiled orbits, with the constants and the state of the Kepler solve. **/
+    private final ElementPositions elements = new ElementPositions();
+    /** Dataset-frame positions, three doubles per element. **/
+
+    /** Copy of the vertex data of the mesh in the GPU, whose positions are rewritten every frame. **/
+    private float[] verts;
+    private int vertsCount;
+    private double lastTjd = Double.NaN;
+
     public ElementsRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         aux1 = new Vector3();
-        maux = new Matrix4();
-        refSysTransformF = new Matrix4();
+        refSysTransformD = new Matrix4D();
+        auxTransformD = new Matrix4D();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
 
@@ -69,8 +82,8 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
         attributes.add(new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(OwnUsage.OrbitElems1, 4, "a_orbitelems01"));
-        attributes.add(new VertexAttribute(OwnUsage.OrbitElems2, 4, "a_orbitelems02"));
+        // Camera-relative position, computed on the CPU in double precision.
+        attributes.add(new VertexAttribute(OwnUsage.OrbitPos, 3, "a_pos"));
         attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
         attributes.add(new VertexAttribute(OwnUsage.TextureIndex, 1, "a_textureIndex"));
     }
@@ -80,8 +93,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
         posOffset = curr.mesh.getVertexAttribute(Usage.Position) != null ? curr.mesh.getVertexAttribute(Usage.Position).offset / 4 : 0;
         uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        elems01Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1).offset / 4 : 0;
-        elems02Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2).offset / 4 : 0;
+        elemPosOffset = curr.mesh.getVertexAttribute(OwnUsage.OrbitPos) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitPos).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
         textureIndexOffset = curr.mesh.getVertexAttribute(OwnUsage.TextureIndex) != null ? curr.mesh.getVertexAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
     }
@@ -102,6 +114,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
 
                 AtomicInteger numVerticesAdded = new AtomicInteger(0);
                 AtomicInteger numParticlesAdded = new AtomicInteger(0);
+                Object[] srcArr = new Object[n];
                 renderables.forEach(renderable -> {
                     Render render = (Render) renderable;
 
@@ -112,6 +125,9 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
                         if (trajectory.bodyRepresentation.isBody()) {
 
                             OrbitComponent oc = trajectory.oc;
+
+                            // Elements, kept for the per-frame position computation.
+                            srcArr[numParticlesAdded.get()] = oc;
 
                             // 4 vertices per particle
                             for (int vert = 0; vert < 4; vert++) {
@@ -125,18 +141,6 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
 
                                 // COLOR
                                 tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(trajectory.bodyColor[0], trajectory.bodyColor[1], trajectory.bodyColor[2], trajectory.bodyColor[3]);
-
-                                // ORBIT ELEMENTS 01
-                                tempVerts[curr.vertexIdx + elems01Offset] = (float) FastMath.sqrt(oc.mu / FastMath.pow(oc.semiMajorAxis * 1000d, 3d));
-                                tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
-                                tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semiMajorAxis * 1000d); // In metres
-                                tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
-
-                                // ORBIT ELEMENTS 02
-                                tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsDouble.degRad);
-                                tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingNode * MathUtilsDouble.degRad);
-                                tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argOfPericenter * MathUtilsDouble.degRad);
-                                tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meanAnomaly * MathUtilsDouble.degRad);
 
                                 // SIZE
                                 tempVerts[curr.vertexIdx + sizeOffset] = trajectory.pointSize;
@@ -159,10 +163,26 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
                 int count = numVerticesAdded.get() * curr.vertexSize;
                 curr.mesh.setVertices(tempVerts, 0, count);
                 curr.mesh.setIndices(tempIndices, 0, numParticlesAdded.get() * 6);
+
+                // Keep everything needed to rewrite the positions every frame.
+                src = srcArr;
+                srcCount = numParticlesAdded.get();
+                // Prepare the orbital elements once: the conversion to radians and the perifocal
+                // rotation do not depend on time.
+                elements.compile(src, srcCount);
+                if (verts == null || verts.length < count) {
+                    verts = new float[count];
+                }
+                System.arraycopy(tempVerts, 0, verts, 0, count);
+                vertsCount = count;
+                lastTjd = Double.NaN;
             }
 
             if (curr != null) {
                 ExtShaderProgram shaderProgram = getShaderProgram();
+
+                // Element positions, in double precision, on the CPU.
+                updatePositions(first.entity, AstroUtils.getJulianDate(GaiaSky.instance.time.getTime()));
 
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
@@ -175,25 +195,6 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
 
                 // VR scale
                 shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
-                // Emulate double, for compatibility
-                double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
-                float curRt1 = (float) curRt;
-                float curRt2 = (float) (curRt - (double) curRt1);
-                shaderProgram.setUniformf("u_t", curRt1, curRt2);
-
-                // Reference system transform
-                var trans = Mapper.transform.get(first.entity);
-                var trajectory = Mapper.trajectory.get(first.entity);
-                Matrix4D refSysTransform = trans.matrix != null ? trans.matrix : null;
-                if (refSysTransform != null) {
-                    if (trajectory.model.isExtrasolar()) {
-                        refSysTransform.putIn(maux).inv();
-                        refSysTransformF.setToRotation(0, 1, 0, -90).mul(maux);
-                    } else {
-                        refSysTransform.putIn(refSysTransformF).inv();
-                    }
-                }
-                shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
 
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);
@@ -208,16 +209,64 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
         }
     }
 
+    /**
+     * Recomputes the camera-relative position of every element of the current mesh, in double
+     * precision, and re-uploads the vertex buffer. The Kepler solve depends on time only, so it is
+     * skipped while the time does not change; the reference-system transform is applied on every
+     * frame, because it moves with its parent.
+     *
+     * @param entity The first entity of the group, which carries the reference-system transform.
+     * @param tjd    Current time, in julian days.
+     */
+    private void updatePositions(Entity entity, double tjd) {
+        if (verts == null || srcCount == 0) {
+            return;
+        }
+
+        // Reference system transform, in double precision.
+        var trans = Mapper.transform.get(entity);
+        Matrix4D refSys = trans != null ? trans.matrix : null;
+        boolean idt = refSys == null;
+        if (!idt) {
+            var trajectory = Mapper.trajectory.get(entity);
+            if (trajectory != null && trajectory.model.isExtrasolar()) {
+                // Extrasolar elements require a phase around Y.
+                refSysTransformD.setToRotation(0, 1, 0, -90).mul(auxTransformD.set(refSys).inv());
+            } else {
+                refSysTransformD.set(refSys).inv();
+            }
+        }
+
+        if (tjd != lastTjd) {
+            // Solve the orbits and write the positions in the same pass.
+            elements.compute(tjd, verts, curr.vertexSize, elemPosOffset, 4, idt ? null : refSysTransformD, null, null);
+            lastTjd = tjd;
+        } else if (!idt) {
+            // Same time, but the transform may have moved with its parent: reuse the orbits.
+            elements.project(verts, curr.vertexSize, elemPosOffset, 4, refSysTransformD, null, null);
+        } else {
+            return;
+        }
+        curr.mesh.setVertices(verts, 0, vertsCount);
+    }
+
     public void reset() {
-        clearMeshes();
+        resetMeshes();
         curr = null;
         forceAdd = true;
+        src = null;
+        srcCount = 0;
+
+        elements.reset();
+        verts = null;
+        vertsCount = 0;
+        lastTjd = Double.NaN;
     }
 
     @Override
     public void notify(Event event, Object source, Object... data) {
         if (event.equals(Event.GPU_DISPOSE_ORBITAL_ELEMENTS)) {
-            if (source instanceof Render)
+            if (source instanceof Render || source == null)
                 GaiaSky.postRunnable(this::reset);
         }
     }

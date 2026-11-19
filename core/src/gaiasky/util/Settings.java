@@ -32,6 +32,7 @@ import gaiasky.gui.main.KeyBindings;
 import gaiasky.gui.main.ModePopupInfo;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.ElementsPath;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.KeyframesManager;
@@ -2462,6 +2463,12 @@ public class Settings extends SettingsObject {
         /** macOS-specific settings. **/
         public MacosSettings macos = new MacosSettings();
         public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
+        /**
+         * Where the positions of the elements of an orbital elements group are computed, see
+         * {@link gaiasky.render.ElementsPath}. Applies immediately: both shader variants are always
+         * compiled and the meshes are rebuilt when it changes.
+         **/
+        public ElementsPath elementsPath = ElementsPath.AUTO;
 
         /** The recommended datasets, as a list of keys. **/
         @JsonIgnore

@@ -37,6 +37,7 @@ import gaiasky.gui.main.GSKeys;
 import gaiasky.gui.main.GamepadMappings;
 import gaiasky.gui.main.KeyBindings;
 import gaiasky.gui.main.KeyBindings.ProgramAction;
+import gaiasky.render.ElementsPath;
 import gaiasky.render.gdx.loader.WarpMeshReader;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -122,7 +123,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             starTexIndex, glowTexIndex;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
-    private OwnSelectBox<String> recGridOrigin, recGridStyle;
+    private OwnSelectBox<String> recGridOrigin, recGridStyle, elementsPathSelect;
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnSelectBox<UpscaleFilter> upscaleFilter;
@@ -1685,6 +1686,34 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to content
         addContentGroup(contentPerformance, titleMultiThread, multiThread, 0f);
 
+        // ORBITAL ELEMENTS PATH
+        OwnLabel titleElementsPath = new OwnLabel(I18n.msg("gui.elementspath"), skin, "header");
+        Table elementsPath = new Table(skin);
+
+        OwnLabel elementsPathLabel = new OwnLabel(I18n.msg("gui.elementspath.mode"), skin);
+        elementsPathSelect = new OwnSelectBox<>(skin);
+        elementsPathSelect.setWidth(selectWidth);
+        elementsPathSelect.setItems(I18n.msg("gui.elementspath.auto"),
+                                     I18n.msg("gui.elementspath.cpu"),
+                                     I18n.msg("gui.elementspath.gpu"));
+        elementsPathSelect.setSelectedIndex(switch (settings.program.elementsPath) {
+            case CPU -> 1;
+            case GPU -> 2;
+            default -> 0;
+        });
+
+        OwnTextArea elementsPathInfo = new OwnTextArea(I18n.msg("gui.elementspath.info"), skin, "info");
+        elementsPathInfo.setDisabled(true);
+        elementsPathInfo.setWidth(400f);
+        elementsPathInfo.setPrefRows(4);
+        elementsPathInfo.clearListeners();
+
+        elementsPath.add(elementsPathLabel).left().padRight(pad34).padBottom(pad10);
+        elementsPath.add(elementsPathSelect).left().padBottom(pad10).row();
+        elementsPath.add(elementsPathInfo).colspan(2).left();
+
+        addContentGroup(contentPerformance, titleElementsPath, elementsPath);
+
         // DRAW DISTANCE
         OwnLabel titleLod = new OwnLabel(I18n.msg("gui.lod"), skin, "header");
 
@@ -1745,7 +1774,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         velVectorsTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.velvec.num.info"), skin));
 
         // LABELS
-        labels.addAll(numThreadsLabel, ddLabel, lodFadeLabel, velVectorsLabel);
+        labels.addAll(numThreadsLabel, ddLabel, lodFadeLabel, velVectorsLabel, elementsPathLabel);
 
         // Add to table
         velVectors.add(velVectorsLabel).left().padRight(pad34).padBottom(pad10);
@@ -3456,6 +3485,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         bean = numThreads.getSelected();
         settings.performance.numberThreads = bean.value;
         settings.performance.multithreading = multithreadCb.isChecked();
+
+        // Orbital elements path. It applies immediately: the meshes are rebuilt with the layout of
+        // the new path, so nothing needs a restart, not even from the welcome screen, where no data
+        // has been loaded yet.
+        ElementsPath newElementsPath = switch (elementsPathSelect.getSelectedIndex()) {
+            case 1 -> ElementsPath.CPU;
+            case 2 -> ElementsPath.GPU;
+            default -> ElementsPath.AUTO;
+        };
+        if (ElementsPath.resolve(newElementsPath) != ElementsPath.current()) {
+            settings.program.elementsPath = newElementsPath;
+            // Drop the cached resolution, then let the elements renderers rebuild their meshes.
+            ElementsPath.reset();
+            EventManager.publish(Event.GPU_DISPOSE_ORBITAL_ELEMENTS, null);
+        } else {
+            settings.program.elementsPath = newElementsPath;
+        }
 
         settings.scene.octree.fade = lodFadeCb.isChecked();
         settings.scene.octree.threshold[0] = MathUtilsDouble.lint(lodTransitions.getValue(),
