@@ -122,7 +122,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * and starts to grow more slowly. Ten astronomical units, in metres: the curve is unchanged
      * around the solar system bodies, and only bends outwards of it.
      */
-    private static final double SPEED_SCALE_FAR_KNEE_M = 10.0 * Constants.AU_TO_U * Constants.U_TO_M;
+    private static final double SPEED_SCALE_FAR_KNEE_M = 50.0 * Constants.AU_TO_U * Constants.U_TO_M;
 
 
     /**
@@ -130,14 +130,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * <p>
      * Linear scaling makes the camera cross the distance to its reference in a constant ~7.7 s at
      * any scale, so the one thing that changes when the reference goes from a planet to a star is
-     * the distance, and with it the speed, by five orders of magnitude. A sub-linear exponent keeps
+     * the distance, and with it the speed, by five orders of magnitude. A sublinear exponent keeps
      * the local feel - the curve below the knee is untouched, and above it the two branches agree in
      * value at the knee - while making the far field slower: the time to cross the reference
      * distance grows as {@code (d / 1 AU)^(1 - exponent)}, i.e. from ~8 s in the solar system to
      * ~50 s at one parsec and ~140 s at one kiloparsec. Raise it towards 1 to get closer to the old
-     * behaviour, lower it to slow the interstellar regime further.
+     * behavior, lower it to slow the interstellar regime further.
      */
-    private static final double SPEED_SCALE_FAR_EXPONENT = 0.93d;
+    private static final double SPEED_SCALE_FAR_EXPONENT = 0.94d;
 
     /**
      * Lower bound of the factor that slows the rotation as the focus fills the screen. Without a
