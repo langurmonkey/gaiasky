@@ -12,10 +12,14 @@
 // drivers (Apple/Metal in particular) do exactly that. An int round-trip is
 // bit-identical but opaque, so the relationship is lost to the optimiser.
 // This is a no-op numerically; define DS_NO_BARRIER to disable it.
+// Never written from the CPU: defaults to 0 at run time. Used only to keep
+// the compiler from proving the round-trips below are no-ops.
 #ifdef DS_NO_BARRIER
 #define DSB(x) (x)
 #else
-#define DSB(x) intBitsToFloat(floatBitsToInt(x))
+uniform int u_dsBarrier;    // 0 if never set (spec default)
+int dsZero() { return u_dsBarrier; }
+#define DSB(x) intBitsToFloat(floatBitsToInt(x) + dsZero())
 #endif
 
 // Setting
