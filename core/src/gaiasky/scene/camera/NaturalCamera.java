@@ -72,167 +72,83 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
-     * Minimum distance from camera to object: one metre in internal units.
+     * One metre in internal units.
      * <p>
-     * A method rather than a constant on purpose. These are physical magnitudes, so their value in
-     * internal units depends on the distance scale factor, and the camera manager is built before
-     * {@code Constants.initialize} runs, i.e. while the factor still holds its default of one. A
-     * constant would freeze the default into the session and be wrong by the scale factor.
+     * A method, not a constant: the value depends on the distance scale factor, which is
+     * initialised after the camera is built.
      */
     private static double minDist() {
         return Constants.M_TO_U;
     }
 
-    /**
-     * Baseline camera speed used right at a body surface, i.e. the lower bound of the speed
-     * scaling curve. Roughly the speed of a walking pace.
-     *
-     * @see #minDist() for why this is a method and not a constant
-     */
+    /** Camera speed at a body surface, in internal units per second. See {@link #minDist()}. */
     private static double surfaceSpeed() {
         return 10d * Constants.M_TO_U;
     }
 
-    /**
-     * Multiplier applied to {@link #surfaceSpeed()} to obtain the lower bound of the velocity
-     * clamp (the "top speed" cap). Deliberately larger than the scaling floor so that the cap
-     * does not become the limiting factor right above a surface.
-     */
+    /** Multiplier of {@link #surfaceSpeed()} for the top-speed cap. */
     private static final double SURFACE_SPEED_CAP_FACTOR = 10d;
 
-    /**
-     * Minimum altitude (in body radii) considered for the near-surface damping factor. Prevents
-     * the damping from diverging when the camera is very close to the surface.
-     */
+    /** Minimum altitude, in body radii, considered by the near-surface damping. */
     private static final double MIN_ALTITUDE_RATIO = 1.0e-1;
 
-    /**
-     * Maximum boost applied to the near-surface damping factor.
-     */
+    /** Maximum boost of the near-surface damping. */
     private static final double MAX_DAMPING_BOOST = 1.0 / MIN_ALTITUDE_RATIO;
 
     /**
-     * Reference altitude used by the logarithmic (power) speed scaling curve, one metre. Speed is
-     * {@link #surfaceSpeed()} at this altitude.
-     *
-     * @see #minDist() for why this is a method and not a constant
+     * Altitude at which the surface speed curve gives {@link #surfaceSpeed()}: one metre.
+     * See {@link #minDist()}.
      */
     private static double speedScaleRefAltitude() {
         return Constants.M_TO_U;
     }
 
-    /**
-     * Exponent of the power scaling curve. Chosen so that the curve still reaches the previous
-     * maximum speed (~2e16 u/s) at {@link #DIST_SMOOTH_UP}.
-     */
+    /** Exponent of the power law of the surface speed curve. */
     private static final double SPEED_SCALE_EXPONENT = 0.67d;
 
-    /**
-     * Hard ceiling of the speed scaling curve.
-     */
+    /** Ceiling of the speed curve. */
     private static final double MAX_SPEED_SCALING = 2.0e16;
 
-    /**
-     * Distance at which the speed curve stops being linear in the distance to the nearest reference
-     * and starts to grow more slowly. Ten astronomical units, in metres: the curve is unchanged
-     * around the solar system bodies, and only bends outwards of it.
-     */
+    /** Distance beyond which the speed curve stops being linearU. */
     private static final double SPEED_SCALE_FAR_KNEE_M = 50.0 * Constants.AU_TO_U * Constants.U_TO_M;
 
-
-    /**
-     * Exponent of the speed curve above {@link #SPEED_SCALE_FAR_KNEE_M}.
-     * <p>
-     * Linear scaling makes the camera cross the distance to its reference in a constant ~7.7 s at
-     * any scale, so the one thing that changes when the reference goes from a planet to a star is
-     * the distance, and with it the speed, by five orders of magnitude. A sublinear exponent keeps
-     * the local feel - the curve below the knee is untouched, and above it the two branches agree in
-     * value at the knee - while making the far field slower: the time to cross the reference
-     * distance grows as {@code (d / 1 AU)^(1 - exponent)}, i.e. from ~8 s in the solar system to
-     * ~50 s at one parsec and ~140 s at one kiloparsec. Raise it towards 1 to get closer to the old
-     * behavior, lower it to slow the interstellar regime further.
-     */
+    /** Exponent of the speed curve above {@link #SPEED_SCALE_FAR_KNEE_M}. */
     private static final double SPEED_SCALE_FAR_EXPONENT = 0.94d;
 
-    /**
-     * Distance above which the curve returns to a linear speed up. Ten megaparsecs, that is, the
-     * edge of the local group: from there out the reference object is a galaxy or a cluster, and the
-     * camera has to cross volumes of hundreds of megaparsecs. The sub-linear exponent makes that
-     * take forever - crossing the reference distance takes ~33 s at this knee and keeps growing - so
-     * the curve bends back to the constant crossing time of the near field, ~8 s again.
-     */
+    /** Distance above which the curve is blended back to linear. */
     private static final double SPEED_SCALE_FAR_LINEAR_KNEE_M = 1.0e8 * Constants.PC_TO_U * Constants.U_TO_M;
 
-    /**
-     * Length, in decades of distance, over which the exponent branch is blended into the linear one
-     * above {@link #SPEED_SCALE_FAR_LINEAR_KNEE_M}. The two branches differ by a factor of four at
-     * the knee and by more further out, so switching between them outright would make the camera
-     * jump in speed as it crosses. One decade is enough to make that a smooth acceleration without
-     * pushing the linear regime out of the near extragalactic range: the curve is fully linear again
-     * at 100 Mpc, the near edge of the SDSS.
-     */
+    /** Decades of distance over which the power law is blended into the linear one. */
     private static final double SPEED_SCALE_FAR_LINEAR_RAMP_DECADES = 1.0d;
 
-    /**
-     * Lower bound of the factor that slows the rotation as the focus fills the screen. Without a
-     * floor, the camera cannot be turned at all when it is very close to a surface.
-     */
+    /** Floor of the factor that slows the rotation as the focus fills the screen. */
     private static final double ROTATION_MIN_FACTOR = 0.15;
 
-    /**
-     * Number of focus radii below which the rotation slowdown starts to kick in.
-     */
+    /** Number of focus radii below which the rotation slowdown starts. */
     private static final double ROTATION_SLOWDOWN_RADII = 2.0;
 
-    /**
-     * Time constant (in seconds) used to ramp the angular rate up to the requested rate.
-     */
+    /** Time constant (s) of the angular rate ramp-up. */
     private static final double ROTATION_ACCEL_TAU = 0.3;
 
-    /**
-     * Time constant (in seconds) used to decay the angular rate to rest when there is no rotation
-     * input. Only used when the camera stops on its own, i.e. outside cinematic mode.
-     */
+    /** Time constant (s) of the angular rate decay when the input stops. Unused in cinematic mode. */
     private static final double ROTATION_DECAY_TAU = 0.15;
 
-    /**
-     * Effectively infinite time constant, used in cinematic mode to hold the current angular rate
-     * once the input stops: the camera keeps rotating at the last requested rate.
-     */
+    /** Effectively infinite time constant (s), used to hold the angular rate in cinematic mode. */
     private static final double ROTATION_HOLD_TAU = 1.0e9;
 
-    /**
-     * Angular rates with a magnitude below this are snapped to zero, so that the exponential decay
-     * actually reaches a full stop instead of crawling asymptotically.
-     */
+    /** Angular rates below this are snapped to zero. */
     private static final double ROTATION_MIN_RATE = 1e-9;
 
-    /**
-     * Time (in seconds) without forward input after which the camera starts being damped to a stop.
-     * Note that {@code lastFwdTime} is in seconds. Only used when {@link #stopsOnRelease()}.
-     */
+    /** Seconds without forward input before the camera starts damping to a stop. Only when {@link #stopsOnRelease()}. */
     private static final double FORWARD_RESPONSE_TIME = 0.25;
 
-    /**
-     * Time (in seconds) of exponential damping applied to the velocity once the forward input has
-     * been released, so that the camera decelerates smoothly to a full stop. Only used when {@link
-     * #stopsOnRelease()}.
-     */
+    /** Time constant (s) of the damping applied once the forward input is released. Only when {@link #stopsOnRelease()}. */
     private static final double STOP_DAMPING_TAU = 0.3;
 
-    /**
-     * Time (in seconds) without forward input after which the camera is stopped outright, in case
-     * the exponential damping has not brought it to a complete rest yet. Only used when {@link
-     * #stopsOnRelease()}.
-     */
+    /** Seconds without forward input after which the camera stops outright. Only when {@link #stopsOnRelease()}. */
     private static final double FORWARD_STOP_TIME = 1.0;
 
-    /**
-     * Time (in seconds) after the last rotation input during which the requested angular rate is
-     * still considered active. The input listeners keep their last value around instead of clearing
-     * it, so this is what tells the camera that the input has actually stopped. It must be at least
-     * one frame long, so that a single dropped input event does not cut the rotation.
-     */
+    /** Seconds after the last rotation input during which the requested rate is still active. */
     private static final double ROTATION_INPUT_GRACE = 0.06;
 
     /**

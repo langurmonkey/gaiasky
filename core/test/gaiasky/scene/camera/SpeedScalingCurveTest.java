@@ -24,8 +24,15 @@ public class SpeedScalingCurveTest {
     private static final double DIST_SMOOTH_UP = 5000.0 * Constants.MPC_TO_U;
     /** The knees of the curve, as the implementation defines them. */
     private static final double KNEE_PC = 50.0 * AU / PC;
-    private static final double FAR_LINEAR_KNEE_PC = 1.0e7;
+    private static final double FAR_LINEAR_KNEE_PC = 1.0e8;
     private static final double FAR_EXPONENT = 0.94;
+    /** Decades of distance over which the exponent branch is blended into the linear one. */
+    private static final double FAR_RAMP_DECADES = 1.0;
+
+    /** Distance past which the curve is fully linear again, i.e. where tests may sample it. */
+    private static double farLinearEnd() {
+        return FAR_LINEAR_KNEE_PC * Math.pow(10, FAR_RAMP_DECADES);
+    }
 
     private static double at(double pc) {
         return NaturalCamera.distanceToSpeedScale(pc * PC * Constants.M_TO_U, DIST_SMOOTH_UP);
@@ -81,17 +88,22 @@ public class SpeedScalingCurveTest {
     @Test
     public void theExtragalacticRegimeIsLinearAgain() {
         // Past the ramp, doubling the distance doubles the speed: constant crossing time again, and
-        // the curve grows in a straight line instead of flattening out.
-        for (double pc : new double[]{2e8, 5e8, 1e9, 2e9}) {
+        // the curve grows in a straight line instead of flattening out. The ramp starts at the second
+        // knee, not before it, so the samples have to sit past its end - sampling inside the blend is
+        // testing the blend, not the linear branch.
+        for (double pc : new double[]{farLinearEnd(), 1.5 * farLinearEnd(), 2.0 * farLinearEnd()}) {
             Assert.assertEquals(2.0, at(2 * pc) / at(pc), 1e-9);
         }
         // Below the second knee it does not: the branch has the exponent.
         Assert.assertEquals(Math.pow(2, FAR_EXPONENT), at(2 * FAR_LINEAR_KNEE_PC / 100) / at(FAR_LINEAR_KNEE_PC / 100), 1e-9);
 
-        // ... and the exponential branch alone would be far slower out there, otherwise the change
-        // is a no-op. At 1 Gpc the camera has to be at least twice as fast as it was.
-        double powerOnly = at(FAR_LINEAR_KNEE_PC) * Math.pow(1e9 / FAR_LINEAR_KNEE_PC, FAR_EXPONENT);
-        Assert.assertTrue("the linear branch adds nothing at 1 Gpc", at(1e9) > 2.0 * powerOnly);
+        // ... and the power branch alone would be far slower out there, otherwise the change is
+        // a no-op. One decade past the second knee the curve is already on the linear branch: at
+        // 1 Gpc it gives 4.0e15 against the 7.0e14 of the power law, i.e. 5.7x faster.
+        double pc = 1e9;
+        double powerOnly = at(FAR_LINEAR_KNEE_PC) * Math.pow(pc / FAR_LINEAR_KNEE_PC, FAR_EXPONENT);
+        Assert.assertEquals(linear(pc), at(pc), 1e-9 * linear(pc));
+        Assert.assertTrue("the linear branch adds nothing at 1 Gpc", at(pc) > 4.0 * powerOnly);
     }
 
     @Test
