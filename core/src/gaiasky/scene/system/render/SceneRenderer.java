@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.GaiaSky;
@@ -60,6 +61,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL40;
 
+import java.nio.IntBuffer;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -103,6 +105,14 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * first frame with an atmosphere; see {@link #snapshotDepth(FrameBuffer)}.
      */
     private DepthOnlyFramebuffer depthSnapshot;
+    /**
+     * A copy of the full-resolution depth, taken right before the volume group draws. The volume colour
+     * pass tests its rays against it instead of against the live depth attachment, which it cannot read
+     * while it draws into the same buffer. See {@link #volumeSceneDepth()}.
+     */
+    private DepthOnlyFramebuffer volumeDepthSnapshot;
+    /** Scratch buffer for the framebuffer binding query in {@link #snapshotDepthInto}. */
+    private final IntBuffer savedDrawFramebuffer = BufferUtils.newIntBuffer(1);
     private Map<RenderGroup, IRenderSystem> renderSystems;
     private List<RenderGroup> renderGroups;
     private RenderSystemRunnable depthTestR,
@@ -580,6 +590,19 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
+     * @return Whether any volume is to be drawn this frame, in either the full- or the half-resolution
+     * list.
+     */
+    private boolean hasVolumeInFrame() {
+        var full = renderListsFull.get(VOLUME.ordinal());
+        if (full != null && !full.isEmpty()) {
+            return true;
+        }
+        var half = renderListsHalf.get(VOLUME.ordinal());
+        return half != null && !half.isEmpty();
+    }
+
+    /**
      * Copies the depth buffer of the source framebuffer into the depth buffer of the destination one. Both must have
      * the same depth attachment format, which is the case for the full- and half-resolution buffers.
      *
@@ -609,34 +632,76 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
-     * Copies the depth of the given framebuffer into {@link #depthSnapshot}, a depth-only target of
-     * the same size and format. The full-resolution buffer is left bound and its viewport untouched,
-     * so this can be done in the middle of the frame - unlike the half-resolution pass.
+     * Copies the depth of the given framebuffer into a depth-only target of the same size and format,
+     * creating or resizing it as needed. The framebuffer that was bound for drawing stays bound and its
+     * viewport is untouched, so this can be done in the middle of the frame - unlike the
+     * half-resolution pass.
+     *
+     * @param target The depth-only target, or null to create one.
+     * @param src    The source framebuffer.
+     *
+     * @return The target, holding the copied depth.
+     */
+    private DepthOnlyFramebuffer snapshotDepthInto(DepthOnlyFramebuffer target,
+                                                   FrameBuffer src) {
+        int w = src.getWidth();
+        int h = src.getHeight();
+        if (target != null && (target.width != w || target.height != h)) {
+            // Resized: a blit needs both sides to match.
+            target.dispose();
+            target = null;
+        }
+        if (target == null) {
+            target = new DepthOnlyFramebuffer(w, h);
+        }
+        var saved = savedDrawFramebuffer;
+        Gdx.gl.glGetIntegerv(GL30.GL_DRAW_FRAMEBUFFER_BINDING, saved);
+        Gdx.gl.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, src.getFramebufferHandle());
+        Gdx.gl.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, target.framebufferHandle);
+        GL30.glBlitFramebuffer(0, 0, w, h,
+                               0, 0, w, h,
+                               GL20.GL_DEPTH_BUFFER_BIT, GL20.GL_NEAREST);
+        // Put back whatever was being drawn into: this runs mid-frame.
+        Gdx.gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, saved.get(0));
+        return target;
+    }
+
+    /**
+     * Copies the depth of the full-resolution buffer into {@link #depthSnapshot}.
      * <p>
      * Called while the full-resolution depth still holds geometry only, before the atmosphere writes
      * the constant depth of its shell into it. The half-resolution pass then tests its content
      * against this copy, so it is occluded by real geometry and not by the atmosphere.
      *
-     * @param fullBuffer The full-resolution buffer, currently bound.
+     * @param fullBuffer The full-resolution buffer.
      */
     private void snapshotDepth(FrameBuffer fullBuffer) {
-        int w = fullBuffer.getWidth();
-        int h = fullBuffer.getHeight();
-        if (depthSnapshot != null && (depthSnapshot.width != w || depthSnapshot.height != h)) {
-            // Resized: a blit needs both sides to match.
-            depthSnapshot.dispose();
-            depthSnapshot = null;
-        }
-        if (depthSnapshot == null) {
-            depthSnapshot = new DepthOnlyFramebuffer(w, h);
-        }
-        Gdx.gl.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, fullBuffer.getFramebufferHandle());
-        Gdx.gl.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, depthSnapshot.framebufferHandle);
-        GL30.glBlitFramebuffer(0, 0, w, h,
-                               0, 0, w, h,
-                               GL20.GL_DEPTH_BUFFER_BIT, GL20.GL_NEAREST);
-        // Keep drawing into the full-resolution buffer.
-        Gdx.gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fullBuffer.getFramebufferHandle());
+        depthSnapshot = snapshotDepthInto(depthSnapshot, fullBuffer);
+    }
+
+    /**
+     * Takes the depth copy the volume colour pass compares its rays against, right before the volumes
+     * are drawn (see {@link #volumeSceneDepth()}).
+     *
+     * @param fullBuffer The full-resolution buffer.
+     */
+    private void snapshotVolumeDepth(FrameBuffer fullBuffer) {
+        volumeDepthSnapshot = snapshotDepthInto(volumeDepthSnapshot, fullBuffer);
+    }
+
+    /**
+     * @return The depth of the scene to test volume rays against: a copy taken just before the volume
+     * group drew, holding the geometry and the volume fronts composed into the scene depth, or null if
+     * no volume has been drawn this frame.
+     * <p>
+     * A copy, and not the live depth attachment, because the volume colour pass draws into the
+     * full-resolution buffer: reading the depth texture of the framebuffer that is bound for drawing is
+     * undefined, and macOS resolves it to zeros. The shader reads a zero there as "nothing occludes",
+     * and the volume is then painted over every solid body in the frame, while the copy holds real
+     * geometry.
+     */
+    public Texture volumeSceneDepth() {
+        return volumeDepthSnapshot == null ? null : volumeDepthSnapshot.texture;
     }
 
     /**
@@ -783,12 +848,20 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             var atmosphereList = renderListsFull.get(MODEL_ATM.ordinal());
             boolean atmosphereInFrame = atmosphereList != null && !atmosphereList.isEmpty();
             boolean depthSnapshotTaken = false;
+            boolean volumeSnapshotTaken = false;
             for (var renderGroup : renderGroups) {
                 if (!depthSnapshotTaken && halfResolutionContent && atmosphereInFrame && renderGroup == MODEL_ATM) {
                     // A depth-only blit into our own target: the full-resolution buffer stays bound, so the
                     // frame is not interrupted while it is half-drawn.
                     snapshotDepth(fullBuffer);
                     depthSnapshotTaken = true;
+                }
+                if (!volumeSnapshotTaken && renderGroup == VOLUME && hasVolumeInFrame()) {
+                    // The volume colour pass draws into this same buffer, so it cannot read its depth
+                    // attachment. Give it a copy, taken here: after the geometry, after the volume
+                    // pre-pass composed its fronts, and before the atmosphere stamps its shell into it.
+                    snapshotVolumeDepth(fullBuffer);
+                    volumeSnapshotTaken = true;
                 }
                 List<IRenderable> l = renderListsFull.get(renderGroup.ordinal());
                 if (l != null && !l.isEmpty()) {
@@ -1120,10 +1193,14 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             renderPasses.forEach(Disposable::dispose);
         }
 
-        // Dispose the depth snapshot.
+        // Dispose the depth snapshots.
         if (depthSnapshot != null) {
             depthSnapshot.dispose();
             depthSnapshot = null;
+        }
+        if (volumeDepthSnapshot != null) {
+            volumeDepthSnapshot.dispose();
+            volumeDepthSnapshot = null;
         }
 
     }

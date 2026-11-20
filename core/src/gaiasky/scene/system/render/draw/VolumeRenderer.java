@@ -197,10 +197,12 @@ public class VolumeRenderer extends AbstractRenderSystem implements IObserver {
      * The depth buffer to compare against: always the full-resolution one, which matches the mask
      * texel for texel and holds everything drawn since the pre-pass.
      * <p>
-     * It holds real geometry only, because the depth is snapshotted before the atmosphere writes its
-     * synthetic shell depth (see {@code SceneRenderer#snapshotDepth}), and the half-resolution pass,
-     * the only place where a volume reading this can run after other systems, tests against that
-     * snapshot.
+     * In the colour pass it is a copy taken just before the volumes drew (see
+     * {@code SceneRenderer#volumeSceneDepth()}), and not the live depth attachment. The colour pass draws
+     * into the full-resolution buffer, and reading the depth texture of the framebuffer that is bound for
+     * drawing is undefined: macOS resolves it to zeros, the shader reads that as "nothing occludes", and
+     * the volume is painted over every solid body in the frame. The pre-pass is the one pass that can read
+     * the live texture - it draws into a target of its own - and it does not use it.
      */
     private Texture sceneDepth() {
         var pingPong = rc != null && rc.ppb != null ? rc.ppb.pp : null;
@@ -210,6 +212,12 @@ public class VolumeRenderer extends AbstractRenderSystem implements IObserver {
         var combined = pingPong.getCombinedBuffer();
         if (combined == null) {
             return null;
+        }
+        if (!depthPass) {
+            var snapshot = sceneRenderer.volumeSceneDepth();
+            if (snapshot != null) {
+                return snapshot;
+            }
         }
         var buffer = combined.getFullBuffer();
         return buffer == null ? null : buffer.getDepthBufferTexture();
