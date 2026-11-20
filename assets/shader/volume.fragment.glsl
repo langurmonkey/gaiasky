@@ -100,6 +100,19 @@ layout(location = 1) out vec4 layerBuffer;
 
 #include <shader/lib/logdepthbuff.glsl>
 
+// Camera-relative positions are in internal units and can go past the point where their own square
+// fits in a float (5.98e5 pc at a scale of 1e6), where length() returns inf and normalize() a zero
+// vector, blanking the volume. These two stay inside the range: scale by the largest component first.
+float positionScale(vec3 p) {
+    return max(max(abs(p.x), abs(p.y)), max(abs(p.z), 1.0e-30));
+}
+
+float magnitude(vec3 p) {
+    float s = positionScale(p);
+    return s * length(p / s);
+}
+
+
 // This volume's own front: depth of its first sample dense enough to occlude, written by the
 // depth-only pre-pass.
 uniform sampler2D u_volumeDepthTexture;
@@ -124,9 +137,10 @@ float volumeOcclusionDistance() {
     if (!(scene < mine - 1.0e-5)) {
         return 0.0;
     }
-    // View depth of the occluder, converted to a distance along this fragment's ray.
+    // View depth of the occluder, converted to a distance along this fragment's ray. Grouped so that
+    // the two lengths are cancelled before they are multiplied: their product overflows a float.
     float sceneDist = 1.0 / recoverWValue(scene, u_cameraNearFar.y, u_cameraK);
-    return sceneDist * length(v_data.fragPosWorld) * gl_FragCoord.w;
+    return sceneDist * (magnitude(v_data.fragPosWorld) * gl_FragCoord.w);
 }
 
 #define PI 3.14159265359
@@ -361,7 +375,9 @@ vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsM
     //    offset twice, which only vanishes when the object sits at the origin (u_cameraPos ~ 0),
     //    as it did in the first test scene.
     vec3 rayOrigin = transpose(R) * u_cameraPos;
-    vec3 rayDir = normalize(transpose(R) * v_data.fragPosWorld);
+    // Scaled first: normalize() of the raw position overflows past 1.8e19 units.
+    vec3 fragDir = v_data.fragPosWorld / positionScale(v_data.fragPosWorld);
+    vec3 rayDir = normalize(transpose(R) * fragDir);
     // Scale to size. The box is normalized - the generator writes it with a side of 1, in
     // units of the object's size, and it is the object's *diameter* - so this is the whole
     // of the mapping from the box to the world: the largest axis spans exactly u_bodySize,
