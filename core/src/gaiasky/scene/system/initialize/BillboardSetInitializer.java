@@ -23,7 +23,6 @@ import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.render.gdx.TextureArrayLoader;
@@ -37,6 +36,11 @@ import java.util.List;
  * Initializes billboard set entities, including their procedural generation and texture management.
  */
 public class BillboardSetInitializer extends AbstractInitSystem {
+
+    /** Angular size factor of the label of a billboard set. Scale free, see {@link #initializeEntity}. **/
+    public static final float LABEL_MAX = 1e-3f;
+    /** Size multiplier of the label of a billboard set. Scale free, see {@link #initializeEntity}. **/
+    public static final float LABEL_FACTOR = 0.6f;
 
     private final Vector3D D31;
     private final ObjectMap<Entity, BillboardDataset[]> generatedDatasets = new ObjectMap<>();
@@ -54,9 +58,13 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         var bb = Mapper.billboardSet.get(entity);
 
         // Label.
+        // Both are dimensionless: the label asks for a world size of
+        // labelMax * distToCamera * labelFactor, and distToCamera already grows with the distance
+        // scale factor, so the label keeps its angular size by itself. Dividing labelMax by the
+        // factor, as it used to be, shrank the label by the factor - at 1e4 it was sub-pixel.
         label.textScale = 3;
-        label.labelMax = (float) (1e-3 / Constants.DISTANCE_SCALE_FACTOR);
-        label.labelFactor = 0.6f;
+        label.labelMax = LABEL_MAX;
+        label.labelFactor = LABEL_FACTOR;
         label.renderConsumer = LabelEntityRenderSystem::renderBillboardSet;
         label.renderFunction = LabelView::renderTextBase;
         label.depthBufferConsumer = LabelView::defaultTextDepthBuffer;
