@@ -1273,11 +1273,9 @@ public class Settings extends SettingsObject {
         public Map<String, Boolean> visibility;
 
         /** The factor by which to scale the distance units in desktop mode. Usually 1. **/
-        @JsonIgnore
         public double distanceScaleDesktop = 1.0;
 
         /** The factor by which to scale the distance units in VR mode. **/
-        @JsonIgnore
         public double distanceScaleVr = 1.0e4;
 
         public void setVisibility(Map<String, Object> map) {

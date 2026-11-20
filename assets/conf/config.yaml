@@ -83,6 +83,10 @@ scene:
   homeObject: Earth
   # Object fade time in ms
   fadeMs: 1500
+  # Distance scale in desktop mode (WARNING: Do not touch this setting unless you know what you are doing)
+  distanceScaleDesktop: 1.0
+  # Distance scale in VR mode (WARNING: Do not touch this setting unless you know what you are doing)
+  distanceScaleVr: 1.0e4
   # Camera configuration
   camera:
     # Camera speed limit
