@@ -212,6 +212,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private final Vector3D aux1, aux2, aux5;
     private final Vector3Q dx, aux1b, aux2b, aux3b, aux4b, aux5b, nextFocusPosition, nextClosestPosition;
+    /** Scratch vector for the distance computation. */
+    private final Vector3Q distTmp = new Vector3Q();
     private final Vector2 aux2f2;
     /**
      * Auxiliary float vector.
@@ -383,9 +385,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Maximum relative growth of the speed scaling, in e-folds per second, when the reference
-     * object changes. The scaling is linear in the smoothed distance, so this caps how fast the top
-     * speed can rise after a handoff: about 4.5x per second, i.e. roughly 5 seconds to go from the
-     * solar system to the interstellar regime.
+     * object changes in free mode. Focus mode skips it: see {@link #updateSmoothedDistances(double)}.
      */
     static final double DISTANCE_MAX_GROWTH_RATE = 1.5d;
 
@@ -1824,9 +1824,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (closestBody == null || !closestBody.isValid()) {
             return NO_CLOSEST_BODY_DISTANCE;
         }
-        return closestBodyDistance(closestBody.getDistToCamera(),
+        return closestBodyDistance(distanceToCamera(closestBody),
                                    closestBody.getElevationAt(pos, false),
                                    closestBody.isBillboard());
+    }
+
+    /**
+     * Distance from the camera position to the given view, ignoring the cache the scene graph
+     * writes once per frame: that one is stale for a frame right after a teleport.
+     */
+    private double distanceToCamera(FocusView view) {
+        // getAbsolutePosition leaves the output untouched for entities without a body component.
+        if (!view.isValid() || view.isSet() || view.isElementsSet() || !Mapper.body.has(view.getEntity())) {
+            return view.getDistToCamera();
+        }
+        return pos.dstD(EntityUtils.getAbsolutePosition(view.getEntity(), distTmp));
     }
 
     /**
@@ -1842,7 +1854,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         rawBodyDistance = getClosestBodyDistance();
 
-        var focusDistance = getMode().isFocus() && focus != null ? focus.getDistToCamera() : Double.MAX_VALUE;
+        var focusDistance = getMode().isFocus() && focus != null ? distanceToCamera(focus) : Double.MAX_VALUE;
 
         // Distance the camera uses with no star nearby: what it uses with the star distance
         // scaling off entirely. Anything past DIST_SMOOTH_UP maps to the same speed, so the
@@ -1932,6 +1944,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double alpha = smoothingAlpha(DISTANCE_SMOOTHING_TAU, dt);
         double next = smoothedDistance + (raw - smoothedDistance) * alpha;
 
+        if (getMode().isFocus()) {
+            // Focus mode: the reference is where the user is looking, so follow it at once.
+            smoothedDistance = next;
+            return;
+        }
+
         // Only a discontinuity in the raw distance means that the reference changed. A gradual one
         // means that the very same reference is getting farther away, so the camera is simply flying
         // out of its neighbourhood and the speed has to follow, not crawl up to it.
@@ -1940,6 +1958,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 : DISTANCE_GROWTH_RATE;
 
         smoothedDistance = limitGrowth(smoothedDistance, next, dt, rate);
+    }
+
+    /**
+     * Drops the smoothed distance, so that the next frame adopts its raw distance at once.
+     */
+    private void resetSmoothedDistance() {
+        synchronized (updateLock) {
+            smoothedDistance = -1;
+            rawDistancesValid = false;
+        }
     }
 
     /**
@@ -2261,6 +2289,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     pos.set((double[]) data[0]);
                     posInv.set(pos)
                             .scl(-1d);
+                    // Teleport: the old speed regime has nothing to do with the new place.
+                    resetSmoothedDistance();
                 }
             }
             case CAMERA_DIR_CMD -> {
@@ -2342,6 +2372,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         pos.add(dx, dy, dz);
                         posInv.set(pos)
                                 .scl(-1d);
+                        // Teleport: the old speed regime has nothing to do with the new place.
+                        resetSmoothedDistance();
                         direction.set(-dx, -dy, -dz)
                                 .nor();
                         up.set(direction.x, direction.z, -direction.y)
