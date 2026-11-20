@@ -567,13 +567,7 @@ public class LabelEntityRenderSystem {
         // Horizon
         float stepAngle = 360f / (divisionsUV * lod);
 
-        // Labels at 1 parsec.
-        // The annotation transform is the rotation of the grid times its size, so it has to be applied
-        // to a unit direction and the scale normalised away; the position is then set to a physical
-        // parsec on its own. Getting either of these wrong makes the distance grow with a power of the
-        // distance scale factor while the camera far plane grows linearly with it: from 1e3 up the
-        // labels reach the far plane and past it they are clipped away entirely, and their angular
-        // size falls with the square of the factor. A parsec is a parsec at any factor.
+        // Labels at 1 parsec, in camera-relative coordinates.
         float distToCamera = (float) (1 * Constants.PC_TO_U);
         float textSize = (float) ((GaiaSky.settings().runtime.openXr ? 2e12 : 2e4) * Constants.DISTANCE_SCALE_FACTOR);
 
