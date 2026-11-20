@@ -18,6 +18,7 @@ import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.data.api.IStarGroupDataProvider;
 import gaiasky.data.group.STILDataProvider;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.data.util.ParticleSetData;
 import gaiasky.data.util.ParticleSetLoader;
 import gaiasky.scene.Mapper;
@@ -188,7 +189,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 provider.setTransformMatrix(transform.matrix);
 
                 AssetManager manager = AssetBean.manager();
-                var param = new ParticleSetLoader.ParticleSetLoaderParameters(provider, set.datafile, set.factor);
+                var datafileUnpacked = GlobalResources.unpackAssetPath(GaiaSky.settings().data.dataFile(set.datafile));
+                var param = new ParticleSetLoader.ParticleSetLoaderParameters(provider, datafileUnpacked, set.factor);
                 manager.load(Integer.toString(set.hashCode()), ParticleSetData.class, param);
             } catch (Exception e) {
                 logger.error(e);
@@ -290,7 +292,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 provider.setTransformMatrix(transform.matrix);
 
                 AssetManager manager = AssetBean.manager();
-                var param = new ParticleSetLoader.ParticleSetLoaderParameters(provider, set.datafile, set.factor);
+                var datafileUnpacked = GlobalResources.unpackAssetPath(GaiaSky.settings().data.dataFile(set.datafile));
+                var param = new ParticleSetLoader.ParticleSetLoaderParameters(provider, datafileUnpacked, set.factor);
                 manager.load(Integer.toString(set.hashCode()), ParticleSetData.class, param);
 
             } catch (Exception e) {
