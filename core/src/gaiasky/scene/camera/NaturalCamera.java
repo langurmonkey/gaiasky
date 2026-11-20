@@ -116,7 +116,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private static final double SPEED_SCALE_FAR_EXPONENT = 0.94d;
 
     /** Distance above which the curve is blended back to linear. */
-    private static final double SPEED_SCALE_FAR_LINEAR_KNEE_M = 1.0e8 * Constants.PC_TO_U * Constants.U_TO_M;
+    private static final double SPEED_SCALE_FAR_LINEAR_KNEE_M = 1.0e10 * Constants.PC_TO_U * Constants.U_TO_M;
 
     /** Decades of distance over which the power law is blended into the linear one. */
     private static final double SPEED_SCALE_FAR_LINEAR_RAMP_DECADES = 1.0d;
