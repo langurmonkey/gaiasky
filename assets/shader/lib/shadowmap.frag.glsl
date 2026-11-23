@@ -9,11 +9,8 @@ uniform sampler2D u_shadowTextureGlobal;
 #endif //shadowMapGlobalFlag
 uniform float u_shadowPCFOffset;
 
-// A texel of the map holds the depth of the nearest surface in the red channel and the opacity of
-// that surface in the green one, as written by depth.fragment.glsl. The map is cleared to
-// (0, 0, 0, 1), so a texel with nothing in it has an opacity of zero: it has to read as fully lit,
-// because treating it as the nearest possible surface shadows everything that falls outside the
-// map.
+// A texel holds the depth of the nearest surface in red and its opacity in green. The map is
+// cleared to (0, 0, 0, 1), so an empty texel has zero opacity and reads as fully lit.
 float getShadowness(sampler2D sampler, vec2 uv, vec2 offset, float compare) {
     vec4 texel = texture(sampler, uv.xy + offset);
     float opacity = texel.g;
@@ -124,12 +121,8 @@ float textureShadowLerp(sampler2D sampler, vec2 size, vec2 uv, float compare){
 float getShadowSingular(sampler2D shadowMap, vec3 shadowMapUv) {
     // Complex lookup: PCF + interpolation (see http://codeflow.org/entries/2013/feb/15/soft-shadow-mapping/)
     vec2 size = vec2(1.0 / (2.0 * u_shadowPCFOffset));
-    // Outside the map, and in front of or behind its depth range, there is nothing to compare
-    // against: the fragment is lit. The texture is clamped to the edge, so without this the taps
-    // that fall off the map return the border texel, which is the silhouette of the occluder, and
-    // paint a hard black band there.
-    // The footprint of the filter is three texels: the two of the loop below, plus the extra one
-    // that textureShadowLerp adds when it rounds to the nearest texel and interpolates.
+    // Outside the map, and beyond its depth range, the fragment is lit: the texture is clamped to
+    // the edge, so without this the border texel paints a black band. The filter is three texels.
     vec2 margin = 3.0 / size;
     if (shadowMapUv.x < margin.x || shadowMapUv.x > 1.0 - margin.x ||
         shadowMapUv.y < margin.y || shadowMapUv.y > 1.0 - margin.y ||

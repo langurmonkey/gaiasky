@@ -97,9 +97,8 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     }
 
     /**
-     * Drops every mesh together with the per-renderable bookkeeping that points into them, so that
-     * the next frame rebuilds everything from scratch. Used when the layout of the vertices has to
-     * change, which cannot be done on a mesh that already exists.
+     * Drops every mesh together with the per-renderable bookkeeping that points into them, so the
+     * next frame rebuilds everything. Used when the vertex layout has to change.
      */
     protected void resetMeshes() {
         clearMeshes();

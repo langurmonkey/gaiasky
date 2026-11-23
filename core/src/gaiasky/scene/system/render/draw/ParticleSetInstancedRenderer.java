@@ -294,9 +294,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimits[0] * sizeFactor),
                                           (float) (set.particleSizeLimits[1] * sizeFactor));
                 if (extended) {
-                    // The per-particle size comes from the data already converted to internal units
-                    // (PC_TO_U), so it scales with the distance factor like the positions do. It must
-                    // not be divided by it, or the particles shrink by a factor of the distance scale.
+                    // The per-particle size is already in internal units, so it scales with the
+                    // distance factor like the positions: it must not be divided by it.
                     shaderProgram.setUniformf("u_sizeFactor", (float) sizeFactor);
                 } else {
                     double s = .3e-4f;

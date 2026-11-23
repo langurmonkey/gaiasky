@@ -442,11 +442,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @return The vertex attributes array.
      */
     /**
-     * Whether the per-instance data of this system is rewritten every frame. When it is, the
-     * instance buffer is allocated as dynamic so that repeated uploads do not go through a
-     * buffer created for static data.
-     *
-     * @return True if the instance data changes every frame.
+     * Whether the per-instance data is rewritten every frame; the instance buffer is then allocated
+     * as dynamic.
      */
     protected boolean isDynamicInstanceData() {
         return false;
@@ -463,11 +460,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     }
 
     /**
-     * Builds the per-instance attributes that are rewritten on every frame. They get a buffer of
-     * their own, so a per-frame update only uploads them and leaves the rest of the instance data
-     * alone. Returns null, which is the common case, when the system has none.
-     *
-     * @return The attributes, or null.
+     * Builds the per-instance attributes that are rewritten every frame, or null (the common case)
+     * when the system has none.
      */
     protected VertexAttribute[] buildAttributesDynamic() {
         return null;

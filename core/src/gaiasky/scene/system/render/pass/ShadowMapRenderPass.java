@@ -333,8 +333,8 @@ public class ShadowMapRenderPass extends RenderPass {
     }
 
     /**
-     * Logs the light camera, the light direction and the geometry actually drawn into the map, to
-     * find out why the map does not cover the object. Enable with DEBUG_SHADOW_MAP.
+     * Logs the light camera, the light direction and the geometry drawn into the map. Enable with
+     * DEBUG_SHADOW_MAP.
      */
     private void debugShadowMapGeometry(Entity candidate,
                                         double entitySpan,
@@ -397,16 +397,8 @@ public class ShadowMapRenderPass extends RenderPass {
     }
 
     /**
-     * Recomputes the view, projection, combined and frustum of a light camera from its position,
-     * direction, up, near, far and field of view.
-     * <p>
-     * Do not use {@link PerspectiveCamera#update(boolean)}: it builds the view matrix with
-     * {@code setToLookAt(position, position + direction, up)}, and since the light cameras sit at
-     * the Sun (a large camera-relative position once the distance scale is raised), the float
-     * addition quantizes the unit direction away. The aim error grows with the distance scale and
-     * reaches 0.28 degrees at 1e4 - more than the half field of view of 0.25 - which moves the
-     * object out of its own shadow map. Building the rotation from the direction itself and
-     * post-translating avoids the cancellation.
+     * Recomputes the matrices and frustum of a light camera. Not {@link PerspectiveCamera#update}:
+     * it adds the direction to a large camera-relative position, which quantizes it away.
      */
     private static void updateLightCamera(PerspectiveCamera cam) {
         cam.view.setToLookAt(cam.direction, cam.up);

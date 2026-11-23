@@ -21,17 +21,7 @@ import java.time.Instant;
 
 /**
  * Resolves the reference frame of a set of orbital elements into a rotation matrix that takes the
- * cartesian position produced by {@link KeplerianElements} into the equatorial frame of the scene.
- * <p>
- * The frame is defined by a pole and a reference direction. The reference direction is always the
- * ascending node of the plane on the equator of J2000, which is the convention of the JPL satellite
- * element tables, so their longitudes of the ascending node can be used as they are. Only the pole
- * has to be chosen, and that is what {@link OrbitReference} selects.
- * <p>
- * Gaia Sky's internal axes put the fundamental plane in ZX, with +Y towards the north equatorial
- * pole and +Z towards the vernal equinox. A frame with pole <i>p</i> and node <i>n</i> is therefore
- * the matrix whose columns are (n, p x n, p): it maps the classic reference axes onto the scene.
- * For the identity frame that is exactly the permutation that {@link KeplerianElements} applies.
+ * cartesian position from {@link KeplerianElements} into the equatorial frame of the scene.
  */
 public final class OrbitFrames {
     private static final Log logger = Logger.getLogger(OrbitFrames.class);
@@ -40,17 +30,8 @@ public final class OrbitFrames {
     }
 
     /**
-     * Resolves the reference frame for the given elements.
-     *
-     * @param oc     The orbit component, which carries the reference and the optional explicit pole.
-     * @param parent The parent entity, whose equator or orbital plane may be the reference. May be
-     *               null, in which case the equatorial plane is used.
-     * @param date   The date at which to sample the plane, for the references that are derived from a
-     *               trajectory. Poles and planes are constant over the timescales of the scene, so
-     *               any date will do; this is only here because evaluating coordinates needs one.
-     * @param out    The matrix to write the result into.
-     *
-     * @return The output matrix, for chaining.
+     * Resolves the reference frame for the given elements. {@code parent} may be null, in which case
+     * the equatorial plane is used.
      */
     public static Matrix4D resolve(OrbitComponent oc, Entity parent, Instant date, Matrix4D out) {
         if (oc == null || oc.reference == null || oc.reference == OrbitReference.INHERITED) {
@@ -79,12 +60,6 @@ public final class OrbitFrames {
 
     /**
      * Builds the frame matrix of a plane, from the right ascension and declination of its pole.
-     *
-     * @param poleRaDeg  Right ascension of the pole, in degrees.
-     * @param poleDecDeg Declination of the pole, in degrees.
-     * @param out        The matrix to write the result into.
-     *
-     * @return The output matrix.
      */
     public static Matrix4D fromPole(double poleRaDeg, double poleDecDeg, Matrix4D out) {
         var pole = Coordinates.sphericalToCartesian(FastMath.toRadians(poleRaDeg), FastMath.toRadians(poleDecDeg), 1.0, new Vector3D());
@@ -92,12 +67,7 @@ public final class OrbitFrames {
     }
 
     /**
-     * Builds the frame matrix of a plane, from its pole.
-     *
-     * @param pole The unit pole of the plane, in equatorial scene coordinates.
-     * @param out  The matrix to write the result into.
-     *
-     * @return The output matrix.
+     * Builds the frame matrix of a plane, from its unit pole.
      */
     public static Matrix4D fromPole(Vector3D pole, Matrix4D out) {
         var p = new Vector3D(pole).nor();
@@ -111,16 +81,14 @@ public final class OrbitFrames {
         }
         node.nor();
         var y = new Vector3D(p).crs(node).nor();
-        // The keplerian conversion produces (reg y, reg z, reg x) in scene axes: the third regular
-        // axis, the pole, lands on +Y, and the first, the node, on +Z. So the columns of this matrix
-        // are the in-plane axis, the pole and the node, in that order.
+        // The keplerian conversion produces (reg y, reg z, reg x), so the columns are the in-plane
+        // axis, the pole and the node, in that order.
         return out.set(Matrix4D.changeOfBasis(y, p, node));
     }
 
     /**
-     * Pole of the equatorial plane of the parent body, taken from its rotation model. This is the
-     * same construction the model updater uses to orient the body, so the orbits end up flattened
-     * onto the equator the body is actually drawn with.
+     * Pole of the equatorial plane of the parent body, from its rotation model, so the orbits land
+     * on the equator the body is actually drawn with.
      */
     private static Vector3D parentEquatorPole(Entity parent) {
         var pole = new Vector3D(0, 1, 0);
@@ -144,10 +112,8 @@ public final class OrbitFrames {
     }
 
     /**
-     * Pole of the orbital plane of the parent body about its own parent, as the normal of its
-     * heliocentric (or barycentric) position sampled twice. Sampling the coordinates rather than the
-     * elements is deliberate: most bodies of the solar system get their position from a series or a
-     * file, and have no elements to read a plane from.
+     * Pole of the orbital plane of the parent about its own parent, as the normal of its position
+     * sampled twice. Sampled from the coordinates because most bodies have no elements.
      */
     private static Vector3D parentOrbitalPole(Entity parent, Instant date) {
         var coordinates = parent != null ? Mapper.coordinates.get(parent) : null;

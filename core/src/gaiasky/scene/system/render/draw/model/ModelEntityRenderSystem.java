@@ -35,20 +35,12 @@ import net.jafama.FastMath;
 public class ModelEntityRenderSystem {
 
     /**
-     * Whether the atmosphere opacity is faded out with the angular size of the planet, i.e. with
-     * the distance to it. This dates from before the scattering rework, when a distant planet with
-     * a closed FOV showed artifacts (the old atmosphere softening hack); the unified integrator and
-     * the depth written from the planet center may have made it unnecessary.
-     * <p>
-     * Set to {@code false} to disable the fade entirely and always use the full atmosphere opacity:
-     * that is the experiment. What to look for with it off: a planet far enough for its disc to be
-     * a few pixels, with the FOV closed, growing a bright ring or halo around the disc, or a color
-     * shift over the disc itself.
+     * Whether the atmosphere opacity is faded out with the angular size of the planet. Dates from
+     * before the scattering rework; set it to {@code false} to run the experiment.
      */
     private static final boolean ATMOSPHERE_FADE_WITH_DISTANCE = false;
     /**
-     * Angular size, in radians, below which the atmosphere is fully transparent. This is the
-     * "solid angle" of the body, i.e. size / distance, without the FOV factor.
+     * Angular size, in radians, below which the atmosphere is fully transparent (size / distance).
      */
     private static final double ATMOSPHERE_FADE_IN_ANGLE = 0.0035;
     /**
@@ -480,11 +472,8 @@ public class ModelEntityRenderSystem {
     }
 
     /**
-     * Computes the opacity multiplier of the atmosphere of a planet from its angular size.
-     *
-     * @param solidAngle The angular size of the body, in radians (size / distance).
-     *
-     * @return The opacity multiplier in [0,1]. Always 1 if the distance fade is disabled.
+     * Computes the opacity multiplier of the atmosphere of a planet from its angular size. Always 1
+     * if the distance fade is disabled.
      */
     static float atmosphereDistanceFade(double solidAngle) {
         if (!ATMOSPHERE_FADE_WITH_DISTANCE) {
@@ -612,12 +601,8 @@ public class ModelEntityRenderSystem {
             var camPos = v3b1.set(GaiaSky.instance.getCameraManager().getPos()).sub(v3b2).put(v3f1);
             cloud.cloud.mc.updateCamPos(camPos);
             cloud.cloud.mc.updateCloudShell(body.size, cloud.cloud);
-            // The proxy draws its far wall, which sits behind everything the clouds cover, so a
-            // depth test on it would reject exactly the pixels the layer belongs on, and there is
-            // nothing worth writing either: see the note in the fragment shader. Occlusion is done
-            // in the shader instead, against the planet sphere analytically and against the scene
-            // depth, which is bound below from the full-resolution buffer so that terrain standing
-            // above the base of the layer, or a nearer body, clips the march.
+            // The proxy draws its far wall, behind everything the clouds cover, so there is neither
+            // a depth test nor a depth write: occlusion is done in the shader instead.
             cloud.cloud.mc.depthTestDisable();
             Texture sceneDepth = sceneDepthTexture(rc);
             if (sceneDepth != null) {
@@ -630,12 +615,8 @@ public class ModelEntityRenderSystem {
     }
 
     /**
-     * The depth buffer of the full-resolution pass, which holds everything drawn so far this frame.
-     *
-     * @param rc The rendering context, may be null for passes that draw off-screen (e.g. the SVT
-     *           detection pass), in which case there is no scene depth to clip against.
-     *
-     * @return The depth texture, or null when unavailable.
+     * The depth buffer of the full-resolution pass. Null for passes that draw off-screen, where
+     * there is no scene depth to clip against.
      */
     private Texture sceneDepthTexture(RenderingContext rc) {
         var pingPong = rc != null && rc.ppb != null ? rc.ppb.pp : null;

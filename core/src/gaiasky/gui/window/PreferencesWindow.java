@@ -3486,9 +3486,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.performance.numberThreads = bean.value;
         settings.performance.multithreading = multithreadCb.isChecked();
 
-        // Orbital elements path. It applies immediately: the meshes are rebuilt with the layout of
-        // the new path, so nothing needs a restart, not even from the welcome screen, where no data
-        // has been loaded yet.
+        // Orbital elements path. Applies immediately: the meshes are rebuilt with the new layout.
         ElementsPath newElementsPath = switch (elementsPathSelect.getSelectedIndex()) {
             case 1 -> ElementsPath.CPU;
             case 2 -> ElementsPath.GPU;

@@ -20,8 +20,7 @@ import java.time.Instant;
 
 /**
  * Tests the resolution of the reference frame of the orbital elements: that the explicit references
- * reproduce the planes they name, that the node is where the JPL tables measure it from, and that the
- * inherited reference stays the identity so that nothing that does not opt in changes.
+ * reproduce the planes they name and that the inherited one stays the identity.
  */
 public class OrbitReferenceTest {
 
@@ -44,8 +43,7 @@ public class OrbitReferenceTest {
     @Test
     public void testEclipticMatchesTheTransformFunction() {
         // The ecliptic reference must produce exactly what transformFunction: eclipticToEquatorial
-        // produced before the property existed, or the two ways of saying the same thing would
-        // disagree.
+        // produced before the property existed.
         var oc = new OrbitComponent();
         oc.setReference("ECLIPTIC");
         var m = OrbitFrames.resolve(oc, null, EPOCH, new Matrix4D());
@@ -63,10 +61,8 @@ public class OrbitReferenceTest {
 
     @Test
     public void testPoleAndNodeLandWhereTheKeplerianFrameExpectsThem() {
-        // The keplerian conversion returns (reg y, reg z, reg x) in scene axes, so the pole of the
-        // plane is carried by +Y and the direction the node is measured from by +Z. Those are the
-        // two axes this matrix has to get right, or a plane's tilt would be applied as a rotation
-        // within the plane.
+        // The keplerian conversion returns (reg y, reg z, reg x), so +Y carries the pole and +Z the
+        // direction the node is measured from.
         double ra = 268.057;
         double dec = 64.495;
         var pole = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec), 1.0, new Vector3D());
@@ -90,9 +86,7 @@ public class OrbitReferenceTest {
     @Test
     public void testTheEclipticPoleProducesTheEclipticTransform() {
         // The same frame built from the pole of the ecliptic must reproduce the transform function
-        // that has always been used for ecliptic elements. This is the check that pins the layout of
-        // the matrix: a cyclic permutation of its columns would still be a proper rotation, and would
-        // still put the pole somewhere sensible, but it would tilt the plane by the wrong angle.
+        // that has always been used, which pins the layout of the matrix.
         var pole = eclipticPole();
         var ra = Math.toDegrees(Math.atan2(pole.x, pole.z));
         var dec = Math.toDegrees(Math.asin(pole.y));

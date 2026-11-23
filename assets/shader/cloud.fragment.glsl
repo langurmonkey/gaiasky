@@ -44,9 +44,8 @@ in vec3 v_ambientLight;
 #include <shader/lib/luma.glsl>
 
 // CLOUD TEXTURE
-// fetchCloudColor picks its mip level from the derivatives of its argument, so it only works in
-// uniform control flow. fetchCloudColorLod takes the level explicitly, for the volumetric march,
-// where the number of iterations differs per fragment and the derivatives would be garbage.
+// fetchCloudColor picks its mip from derivatives, so it only works in uniform control flow.
+// fetchCloudColorLod takes the level explicitly, for the volumetric march.
 #if defined(svtIndirectionDiffuseTextureFlag)
 #include <shader/lib/svt.glsl>
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
@@ -146,11 +145,8 @@ float cloudLimbFade(vec3 viewDir, vec3 normal, float fadePixels) {
     return factor;
 }
 
-// Volumetric clouds: marched between the planet surface and the shell, in place of the surface
-// shading below when the material asks for it (u_cloudVolumetric). See
-// assets/shader/cloud/volumetric.glsl and the cloud brief in notes/. Included unconditionally so
-// that every cloud shares one compiled program and the choice is a uniform, not a define. It comes
-// after cloudLimbFade(), which the far-field end of its transition reuses.
+// Volumetric clouds (u_cloudVolumetric): marched in cloud/volumetric.glsl in place of the surface
+// shading below. Included unconditionally so the choice is a uniform, not a define.
 #include <shader/cloud/volumetric.glsl>
 
 void main() {

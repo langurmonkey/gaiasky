@@ -136,10 +136,8 @@ void main() {
 
     v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
 
-    // 'a_size * u_sizeFactor' is in uncompressed units, while 'dist' is measured in the compressed
-    // space. The limits are tangents of angles, so they only mean the right thing against the
-    // uncompressed distance: the whole clamp has to happen there, and the result compressed once at
-    // the end so that the size lives in the same space as 'pos'.
+    // The size is in uncompressed units and the limits are tangents of angles, so the clamp has to
+    // happen there and the result compressed once at the end.
     float distU = dist * vrScale;
     float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * distU, u_sizeLimits.y * distU) / vrScale;
 

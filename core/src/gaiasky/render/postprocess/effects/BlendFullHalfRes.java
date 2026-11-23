@@ -16,11 +16,8 @@ import gaiasky.util.Constants;
 
 public class BlendFullHalfRes extends PostProcessorEffect {
     /**
-     * Anything nearer than this is "near scene" to the full/half composite: about 670 AU, which is
-     * within the solar system and far inside the kpc distance of the volumes this pass composites.
-     * It is a physical distance on purpose - see {@code fullhalfresblend.frag.glsl}, whose test used
-     * to be an absolute 1e5 internal units, i.e. this distance on the desktop and 0.067 AU at scale
-     * 1e4.
+     * Anything nearer than this is "near scene" to the full/half composite: about 670 AU, within the
+     * solar system and far inside the kpc distance of the volumes it composites.
      */
     private static final double NEAR_SCENE_M = 1.0e14;
 

@@ -14,9 +14,8 @@ public class Vector4Attribute extends Attribute {
     public static final String HtermsAlias = "hterms";
     public static final int Hterms = register(HtermsAlias);
     /**
-     * Geometry of a volumetric cloud layer, in internal units in the cloud object's frame:
-     * {@code (planetRadius, layerBaseRadius, layerTopRadius, layerThickness)}. See
-     * {@code assets/shader/cloud/volumetric.glsl}.
+     * Geometry of a volumetric cloud layer, in internal units in the object's frame:
+     * {@code (planetRadius, layerBaseRadius, layerTopRadius, layerThickness)}.
      **/
     public static final String CloudShellAlias = "cloudShell";
     public static final int CloudShell = register(CloudShellAlias);

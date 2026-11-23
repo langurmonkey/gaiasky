@@ -67,9 +67,8 @@ layout(location = 1) out vec4 layerBuffer;
 
 #include <shader/lib/logdepthbuff.glsl>
 
-// Camera-relative positions are in internal units and can go past the point where their own square
-// fits in a float (5.98e5 pc at a scale of 1e6), where length() returns inf and normalize() a zero
-// vector, blanking the volume. These two stay inside the range: scale by the largest component first.
+// Camera-relative positions can exceed the range where their square fits in a float, so these
+// helpers scale by the largest component first.
 float positionScale(vec3 p) {
     return max(max(abs(p.x), abs(p.y)), max(abs(p.z), 1.0e-30));
 }
@@ -227,18 +226,8 @@ float emptyBrickSteps(vec3 uvw, vec3 rayDir, vec3 boundsMin, vec3 boundsMax, sam
     vec3 nextBoundary = floor(b) + max(sign(g), vec3(0.0));
     // An axis the ray is parallel to cannot bound the exit, and 0/0 is a NaN that would poison the
     // min(): give it a denominator it cannot divide by and a distance that cannot win.
-    //
-    // Which axis is parallel has to be decided on the *direction*, not on g. g is bricks per
-    // internal unit, i.e. it carries the box's size in internal units, and those scale with
-    // Constants.DISTANCE_SCALE_FACTOR: the same galaxy gives g ~ 1e-10 at scale 1 and ~1e-14 at
-    // 1e4. A fixed threshold on g therefore changes meaning with the scale factor - and once every
-    // axis falls below it, all three boundaries become 1e30, the exit distance overflows the
-    // remaining steps and the ray is *terminated at the first sample that lands in an empty brick*.
-    // That cut the gas off at the brick lattice: the staircase silhouette and the black slabs
-    // above, below and at the edges of the disk, at scale 1e2 and over, and nowhere at 1e1.
-    // rayDir is normalised and dimensionless, so a threshold on it means the same thing at every
-    // scale. The denominator is kept non-zero wherever the direction is not parallel, so the
-    // division below can never produce an inf or a NaN.
+    // Which axis is parallel is decided on rayDir, not on g: g scales with the distance factor,
+    // so a threshold on it changes meaning with the scale. rayDir is normalized and dimensionless.
     vec3 parallel = step(abs(rayDir), vec3(1.0e-6));
     vec3 safeG = sign(g) * max(abs(g), vec3(1.0e-30));
     safeG = mix(safeG, vec3(1.0), parallel);

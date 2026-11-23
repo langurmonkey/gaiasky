@@ -73,9 +73,8 @@ void main() {
     vec4 diffuse = fetchColorDiffuse(v_data.color, v_data.texCoords, vec4(1.0, 1.0, 1.0, 1.0));
     float opacity = diffuse.a;
 
-    // Fill the buffer with the depth in the red channel and the opacity in the green one, which
-    // is the layout the shadow lookup in lib/shadowmap.frag.glsl decodes. The map is cleared to
-    // (0, 0, 0, 1), so an untouched texel reads as an opacity of zero, that is, as unoccluded.
+    // Depth in the red channel and opacity in the green one, as lib/shadowmap.frag.glsl decodes.
+    // The map is cleared to (0, 0, 0, 1), so an untouched texel reads as unoccluded.
     fragColor = vec4(gl_FragCoord.z, opacity, 0.0, 1.0);
 }
 

@@ -100,15 +100,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      **/
     private List<List<IRenderable>> renderListsFull, renderListsHalf;
     /**
-     * A copy of the full-resolution depth, taken before the atmosphere writes the constant depth of its
-     * shell into the live buffer. The half-resolution pass tests its content against it. Null until the
-     * first frame with an atmosphere; see {@link #snapshotDepth(FrameBuffer)}.
+     * Copy of the full-resolution depth taken before the atmosphere writes the constant depth of its
+     * shell. Null until the first frame with an atmosphere; see {@link #snapshotDepth(FrameBuffer)}.
      */
     private DepthOnlyFramebuffer depthSnapshot;
     /**
-     * A copy of the full-resolution depth, taken right before the volume group draws. The volume colour
-     * pass tests its rays against it instead of against the live depth attachment, which it cannot read
-     * while it draws into the same buffer. See {@link #volumeSceneDepth()}.
+     * Copy of the full-resolution depth taken right before the volume group draws, which the volume
+     * colour pass tests its rays against. See {@link #volumeSceneDepth()}.
      */
     private DepthOnlyFramebuffer volumeDepthSnapshot;
     /** Scratch buffer for the framebuffer binding query in {@link #snapshotDepthInto}. */
@@ -209,10 +207,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             GL40.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         };
-        // Premultiplied alpha: the source is added, and the destination is
-        // attenuated by the source alpha. Lets one pass have opaque fragments
-        // (the photosphere blocks the background) and emissive ones (the corona
-        // is added without dimming anything).
+        // Premultiplied alpha: the source is added and the destination attenuated by its alpha, so
+        // one pass can have opaque (photosphere) and emissive (corona) fragments.
         premultipliedBlendR = (renderSystem, renderList, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             GL40.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -600,8 +596,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
-     * @return Whether any volume is to be drawn this frame, in either the full- or the half-resolution
-     * list.
+     * @return Whether any volume is to be drawn this frame, full- or half-resolution.
      */
     private boolean hasVolumeInFrame() {
         var full = renderListsFull.get(VOLUME.ordinal());
@@ -642,15 +637,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
-     * Copies the depth of the given framebuffer into a depth-only target of the same size and format,
-     * creating or resizing it as needed. The framebuffer that was bound for drawing stays bound and its
-     * viewport is untouched, so this can be done in the middle of the frame - unlike the
-     * half-resolution pass.
-     *
-     * @param target The depth-only target, or null to create one.
-     * @param src    The source framebuffer.
-     *
-     * @return The target, holding the copied depth.
+     * Copies the depth of the given framebuffer into a depth-only target of the same size, creating
+     * or resizing it as needed. The bound framebuffer stays bound, so this can run mid-frame.
      */
     private DepthOnlyFramebuffer snapshotDepthInto(DepthOnlyFramebuffer target,
                                                    FrameBuffer src) {
@@ -677,63 +665,33 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
-     * Copies the depth of the full-resolution buffer into {@link #depthSnapshot}.
-     * <p>
-     * Called while the full-resolution depth still holds geometry only, before the atmosphere writes
-     * the constant depth of its shell into it. The half-resolution pass then tests its content
-     * against this copy, so it is occluded by real geometry and not by the atmosphere.
-     *
-     * @param fullBuffer The full-resolution buffer.
+     * Copies the depth of the full-resolution buffer into {@link #depthSnapshot}, while it still
+     * holds geometry only, so the half-resolution pass is not occluded by the atmosphere.
      */
     private void snapshotDepth(FrameBuffer fullBuffer) {
         depthSnapshot = snapshotDepthInto(depthSnapshot, fullBuffer);
     }
 
     /**
-     * Takes the depth copy the volume colour pass compares its rays against, right before the volumes
-     * are drawn (see {@link #volumeSceneDepth()}).
-     *
-     * @param fullBuffer The full-resolution buffer.
+     * Takes the depth copy the volume colour pass compares its rays against, right before the
+     * volumes are drawn.
      */
     private void snapshotVolumeDepth(FrameBuffer fullBuffer) {
         volumeDepthSnapshot = snapshotDepthInto(volumeDepthSnapshot, fullBuffer);
     }
 
     /**
-     * @return The depth of the scene to test volume rays against: a copy taken just before the volume
-     * group drew, holding the geometry and the volume fronts composed into the scene depth, or null if
-     * no volume has been drawn this frame.
-     * <p>
-     * A copy, and not the live depth attachment, because the volume colour pass draws into the
-     * full-resolution buffer: reading the depth texture of the framebuffer that is bound for drawing is
-     * undefined, and macOS resolves it to zeros. The shader reads a zero there as "nothing occludes",
-     * and the volume is then painted over every solid body in the frame, while the copy holds real
-     * geometry.
+     * The depth the volume colour pass tests its rays against: a copy, because that pass cannot read
+     * the depth of the buffer it draws into. Null if no volume has been drawn this frame.
      */
     public Texture volumeSceneDepth() {
         return volumeDepthSnapshot == null ? null : volumeDepthSnapshot.texture;
     }
 
     /**
-     * Draws everything routed to the half-resolution buffer (renderables flagged with
-     * {@code halfResolutionBuffer}) into that buffer, and goes back to the full-resolution one.
-     * <p>
-     * The half-resolution buffer is cleared and given a copy of the depth of the geometry, so that its
-     * content is occluded by full-resolution geometry. That copy is {@code depthSnapshot} when there was
-     * an atmosphere in the frame - it holds no synthetic shell depth - and the full-resolution buffer
-     * itself otherwise.
-     * <p>
-     * It runs at the end of the frame. Unbinding the full-resolution buffer in the middle of the frame,
-     * with the scene half-drawn in it, is not reliable: on macOS the elements drawn after the pass lost
-     * their depth range. Only the depth blit that {@link #snapshotDepth(FrameBuffer)} does may happen
-     * mid-frame.
-     *
-     * @param camera                 The camera.
-     * @param t                      The session time, in seconds.
-     * @param fullBuffer             The full-resolution buffer, currently bound.
-     * @param halfBuffer             The half-resolution buffer.
-     * @param halfResolutionContent  Whether there is anything to draw in the pass.
-     * @param renderContext          The render context.
+     * Draws everything routed to the half-resolution buffer into that buffer, and goes back to the
+     * full-resolution one. Runs at the end of the frame, as unbinding the full-resolution buffer
+     * mid-frame is not reliable.
      */
     private void renderHalfResolutionPass(ICamera camera,
                                           double t,
@@ -852,9 +810,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             var fullBuffer = pp.getCombinedBuffer().getFullBuffer();
             var halfBuffer = pp.getCombinedBuffer().getHalfBuffer();
             boolean halfResolutionContent = hasHalfResolutionContent();
-            // An atmosphere writes a depth into the frame that is not geometry: a constant distance for the
-            // motion blur, shared by every pixel of the shell. The half-resolution pass must not test its
-            // content against that, so the depth it copies is snapshotted before the atmosphere is drawn.
+            // An atmosphere writes a non-geometric depth into the frame, so the half-resolution pass
+            // must test against a copy taken before it is drawn.
             var atmosphereList = renderListsFull.get(MODEL_ATM.ordinal());
             boolean atmosphereInFrame = atmosphereList != null && !atmosphereList.isEmpty();
             boolean depthSnapshotTaken = false;
@@ -868,8 +825,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 }
                 if (!volumeSnapshotTaken && renderGroup == VOLUME && hasVolumeInFrame()) {
                     // The volume colour pass draws into this same buffer, so it cannot read its depth
-                    // attachment. Give it a copy, taken here: after the geometry, after the volume
-                    // pre-pass composed its fronts, and before the atmosphere stamps its shell into it.
+                    // attachment: give it a copy, taken here.
                     snapshotVolumeDepth(fullBuffer);
                     volumeSnapshotTaken = true;
                 }

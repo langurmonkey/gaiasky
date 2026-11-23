@@ -40,8 +40,8 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
     }
 
     /**
-     * Distance, in internal units, below which a pixel counts as near-scene geometry in the
-     * composite. Must be given in units, so that the caller converts it from a physical distance.
+     * Distance, in internal units, below which a pixel counts as near-scene geometry: the caller
+     * converts it from a physical distance.
      */
     public void setNearScene(float nearScene) {
         this.nearScene = nearScene;

@@ -58,10 +58,8 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         var bb = Mapper.billboardSet.get(entity);
 
         // Label.
-        // Both are dimensionless: the label asks for a world size of
-        // labelMax * distToCamera * labelFactor, and distToCamera already grows with the distance
-        // scale factor, so the label keeps its angular size by itself. Dividing labelMax by the
-        // factor, as it used to be, shrank the label by the factor - at 1e4 it was sub-pixel.
+        // Both are dimensionless, and distToCamera already grows with the distance factor, so the
+        // label keeps its angular size. Dividing by the factor made it sub-pixel at 1e4.
         label.textScale = 3;
         label.labelMax = LABEL_MAX;
         label.labelFactor = LABEL_FACTOR;

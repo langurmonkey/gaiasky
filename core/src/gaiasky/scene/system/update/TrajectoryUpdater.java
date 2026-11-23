@@ -148,12 +148,8 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
     }
 
     /**
-     * Resolves and caches the reference frame of a trajectory whose elements name their reference
-     * plane explicitly. Returns null when the elements inherit their frame, in which case the caller
-     * keeps using the transform function and the parent's orientation.
-     * <p>
-     * The frame is resolved at the epoch of the elements, J2000, and cached: it depends on the pole of
-     * a plane, which does not move over the timescales of the scene.
+     * Resolves and caches the frame of a trajectory whose elements name their reference plane
+     * explicitly. Null when they inherit it. Cached: the plane does not move.
      */
     private Matrix4D explicitReferenceFrame(Trajectory trajectory,
                                             GraphNode graph) {

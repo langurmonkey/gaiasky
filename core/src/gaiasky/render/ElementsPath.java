@@ -11,20 +11,8 @@ import gaiasky.GaiaSky;
 import gaiasky.util.SysUtils;
 
 /**
- * Selects where the positions of the elements of an orbital elements group are computed.
- * <p>
- * The GPU path solves Kepler's equation in the vertex shader, once per vertex, from orbital
- * elements that are uploaded once. It is the cheapest option by far, but it recomputes the
- * position in single precision from time to time, which some drivers (macOS) do not keep stable:
- * the elements visibly jitter.
- * <p>
- * The CPU path solves it once per element and frame, in double precision, and uploads the result.
- * The arithmetic is more expensive and costs twelve bytes per element and frame of transfer, but
- * the position is exact, so it does not jitter anywhere.
- * <p>
- * Both shader variants are compiled at startup and the choice is read when a mesh is built, so the
- * path can be changed at runtime: {@link #reset()} drops the cached resolution and the renderers
- * rebuild their meshes with the new layout.
+ * Selects where the positions of an orbital elements group are computed: in the vertex shader
+ * (fast, but jitters on some drivers such as macOS) or on the CPU, in double precision.
  */
 public enum ElementsPath {
     /** Pick the path that suits the platform. */
@@ -40,32 +28,22 @@ public enum ElementsPath {
     private static ElementsPath resolved;
 
     /**
-     * Returns the path this platform prefers: the CPU on macOS, where the GPU path jitters, and the
-     * GPU everywhere else, where it is much faster.
-     *
-     * @return The default path for the platform in use.
+     * Returns the path this platform prefers: the CPU on macOS, the GPU everywhere else.
      */
     public static ElementsPath platformDefault() {
         return SysUtils.isMac() ? CPU : GPU;
     }
 
     /**
-     * Returns the path that a setting value stands for, resolving {@link #AUTO}.
-     *
-     * @param path The setting value.
-     * @return The path to use, never {@link #AUTO}.
+     * Resolves a setting value to a path, turning {@link #AUTO} into the platform default.
      */
     public static ElementsPath resolve(ElementsPath path) {
         return path == null || path == AUTO ? platformDefault() : path;
     }
 
     /**
-     * Returns the path to use, resolving {@link #AUTO} for the current platform. The result is
-     * cached, because it is read once per mesh and per frame, and it must not change in the middle
-     * of a frame: the layout of the mesh is built from it. Call {@link #reset()} after changing the
-     * setting to pick up the new value.
-     *
-     * @return The path in effect.
+     * Returns the path in effect, resolving and caching {@link #AUTO}. Call {@link #reset()} after
+     * changing the setting.
      */
     public static ElementsPath current() {
         if (resolved == null) {
@@ -91,7 +69,7 @@ public enum ElementsPath {
     }
 
     /**
-     * Clears the cached resolution, so the next call to {@link #current()} reads the setting again.
+     * Clears the cached resolution, so the next call to {@link #current()} reads the setting.
      */
     public static void reset() {
         resolved = null;

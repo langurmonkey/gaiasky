@@ -189,13 +189,8 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
             int numElements = faces.size;
             int numFaces = group.numFaces;
             boolean hasNorms = group.hasNorms;
-            // A mesh without texture coordinates cannot be textured: the vertex
-            // buffer would be built without a_texCoord0, the attribute would stay at
-            // its default and every fragment of the group would sample the same texel
-            // of whatever texture gets attached later. When the file has no vt
-            // entries, project spherical coordinates instead, so that a material
-            // supplied from outside (see ModelComponent.setMaterial) has somewhere to
-            // land.
+            // Without vt entries the vertex buffer has no a_texCoord0 and every fragment samples
+            // the same texel, so project spherical coordinates for a material supplied from outside.
             boolean generateUVs = !group.hasUVs;
             boolean hasUVs = group.hasUVs || generateUVs;
             // Normals computed in-loader (no vn entries in the file) are
@@ -332,10 +327,8 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
     }
 
     /**
-     * Longitude of a vertex about the model centre, in [0, 1]. Measured from +X
-     * towards -Z, which is the direction the libgdx sphere primitive sweeps, so a
-     * model textured through this loads with the same orientation as the equivalent
-     * procedural sphere.
+     * Longitude of a vertex about the model centre, in [0, 1], measured from +X towards -Z to match
+     * the libgdx sphere primitive.
      */
     private static float sphericalU(float x,
                                     float z,
@@ -345,9 +338,8 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
     }
 
     /**
-     * Latitude of a vertex about the model centre, in [0, 1] from the north pole
-     * (v = 0) to the south pole (v = 1), matching an equirectangular map stored with
-     * north at the top.
+     * Latitude of a vertex about the model centre, in [0, 1] from the north pole, matching an
+     * equirectangular map stored with north at the top.
      */
     private static float sphericalV(float x,
                                     float y,
@@ -362,14 +354,8 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
     }
 
     /**
-     * Removes the wrap-around of a generated longitude field. A triangle that
-     * straddles u = 0 has corners at both ends of [0, 1] and would stretch the whole
-     * texture across itself; shifting the offending corners by a whole turn puts the
-     * face back together. The textures wrap, so u outside [0, 1] is harmless.
-     *
-     * @param finalVerts The vertex buffer, already expanded to per-corner vertices.
-     * @param numFaces   Number of triangles in it.
-     * @param hasNorms   Whether each vertex carries a normal, which sets the stride.
+     * Removes the wrap-around of a generated longitude field: a triangle straddling u = 0 has its
+     * corners a whole turn apart and stretches the texture across itself. The textures wrap.
      */
     private static void fixSeam(float[] finalVerts,
                                 int numFaces,

@@ -24,12 +24,8 @@ import gaiasky.util.scene2d.Separator;
 import java.util.Locale;
 
 /**
- * Live read-out of the closest-star distance scaling used by the camera speed, plus editable low
- * and high radius multipliers. Meant for tuning: it shows what the camera sees this frame, so it
- * does not compute anything of its own.
- * <p>
- * Only meaningful in free mode, which is the only mode where the closest star drives the
- * distance. The values are refreshed a few times per second while the window is open.
+ * Live read-out of the closest-star distance scaling, plus editable low and high radius multipliers.
+ * Free mode only; refreshed a few times per second while the window is open.
  */
 public class StarDistanceWindow extends GenericDialog {
     private static final float UPDATE_INTERVAL = 0.1f;

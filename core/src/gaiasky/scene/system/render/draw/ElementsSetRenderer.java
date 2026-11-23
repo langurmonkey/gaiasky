@@ -389,9 +389,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     shaderProgram.setUniformf("u_falloff", getProfileDecay(shadingType, profileDecay));
                     shaderProgram.setUniformf("u_sizeLimits", (float) (sizeLimits[0] * sizeFactor),
                                               (float) (sizeLimits[1] * sizeFactor));
-                    // The size is a nominal length in local units and the shader multiplies it by the
-                    // distance factor (u_vrScale), so that it scales like the positions and the
-                    // angular size stays the same whatever the distance scale factor is.
+                    // The size is a nominal length in local units and the shader multiplies it by
+                    // u_vrScale, so the angular size is the same whatever the distance factor is.
                     shaderProgram.setUniformf("u_sizeFactor", (float) sizeFactor);
 
                     // Shading type.
@@ -403,9 +402,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     // Element positions.
                     double tjd = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
                     if (gpuPath) {
-                        // The shader solves Kepler's equation itself. Time goes as an emulated
-                        // double: a float cannot hold a julian date with sub-day resolution, and the
-                        // mean anomaly is accumulated from the epoch.
+                        // The shader solves Kepler itself. Time goes as an emulated double: a float
+                        // cannot hold a julian date with sub-day resolution.
                         float tHigh = (float) tjd;
                         shaderProgram.setUniformf("u_t", tHigh, (float) (tjd - (double) tHigh));
 
@@ -502,9 +500,6 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
 
     /**
      * Returns the position state of the given mesh offset, creating it if needed.
-     *
-     * @param offset The mesh offset.
-     * @return The position state.
      */
     private InstancePositions getPositions(int offset) {
         while (positions.size <= offset) {
@@ -514,27 +509,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     }
 
     /**
-     * Recomputes the camera-relative position of every instance of the given mesh and uploads the
-     * instance buffer. The Kepler solve only depends on time, so it is skipped while the time does
-     * not change; the reference-system transform and the dataset origin are applied every frame,
-     * because both move with the camera.
-     *
-     * @param ip     Position state of the mesh.
-     * @param curr   Mesh data.
-     * @param graph  Graph node of the dataset.
-     * @param set    Particle set, if any.
-     * @param affine Affine transformations of the dataset, if any.
-     * @param tjd    Current time, in julian days.
-     */
-    /**
      * Writes the orbital elements of an orbit component into the instance buffer, in the layout and
-     * the units the vertex shader expects: period in days, epoch in julian days, semi-major axis in
-     * kilometres, and the angles in radians.
-     *
-     * @param data The instance buffer.
-     * @param o1   Offset of the first element quad.
-     * @param o2   Offset of the second element quad.
-     * @param oc   The orbit component.
+     * the units the vertex shader expects (period in days, epoch in julian days, angles in radians).
      */
     private static void setElementsAttributes(float[] data,
                                               int o1,
@@ -561,12 +537,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
 
     /**
      * Writes the orbital elements of a particle record into the instance buffer, in the layout and
-     * the units the vertex shader expects. See {@link #setElementsAttributes(float[], int, int, OrbitComponent)}.
-     *
-     * @param data The instance buffer.
-     * @param o1   Offset of the first element quad.
-     * @param o2   Offset of the second element quad.
-     * @param k    The particle record.
+     * the units the vertex shader expects.
      */
     private static void setElementsAttributes(float[] data,
                                               int o1,
@@ -585,6 +556,10 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
         data[o2 + 3] = (float) (k.meanAnomaly() * MathUtilsDouble.degRad);
     }
 
+    /**
+     * Recomputes the camera-relative position of every instance of the given mesh and uploads the
+     * instance buffer. The Kepler solve is skipped while the time does not change.
+     */
     private void updatePositions(InstancePositions ip,
                                  MeshData curr,
                                  GraphNode graph,
@@ -647,14 +622,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     }
 
     /**
-     * Accumulates and prints the time spent per frame on the element positions. Enabled with
-     * {@code -Pgaiasky.elements.profile=true}, prints once a second.
-     *
-     * @param frame   Nanoseconds since the previous frame, so the total budget can be compared.
-     * @param compute Nanoseconds spent solving the orbits and writing the positions.
-     * @param upload  Nanoseconds spent copying the position buffer into direct memory. The transfer
-     *                to the driver happens later, when the mesh is bound, so it is not included.
-     * @param count   Number of elements of this mesh.
+     * Accumulates and prints the time spent per frame on the element positions, once a second.
+     * Enabled with {@code -Pgaiasky.elements.profile=true}.
      */
     private static void profile(long frame, long compute, long upload, int count) {
         prFrame += frame;
@@ -677,15 +646,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     }
 
     /**
-     * Builds the inverse reference-system transform of the given dataset, in double precision.
-     * Mirrors {@link InstancedRenderSystem#setRefSysTransformAndDatasetPosUniforms()}, but stays in
-     * doubles all the way: a float matrix cannot hold the translation of an extrasolar system
-     * without losing the orbit around it.
-     *
-     * @param graph The dataset graph node.
-     * @param set   The particle set, if any.
-     * @param out   The output matrix.
-     * @return True if the resulting transform is the identity.
+     * Builds the inverse reference-system transform of the given dataset in double precision: a float
+     * matrix cannot hold an extrasolar translation without losing the orbit around it.
      */
     private boolean computeRefSysTransform(GraphNode graph,
                                            ParticleSet set,

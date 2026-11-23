@@ -73,8 +73,7 @@ public class FloatAttribute extends Attribute {
 
     /**
      * 1 when the cloud layer is raymarched, 0 when the shell shader is used. A uniform rather than a
-     * define on purpose: a define would make a second compiled variant of the cloud shader, and the
-     * batch reuses a shader whenever the attribute mask matches, so the variant would not be picked.
+     * define: the batch reuses a shader whenever the attribute mask matches.
      **/
     public static final String CloudVolumetricAlias = "cloudVolumetric";
     public static final int CloudVolumetric = register(CloudVolumetricAlias);

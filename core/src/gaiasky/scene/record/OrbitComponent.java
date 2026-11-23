@@ -35,15 +35,12 @@ public class OrbitComponent {
     /** Inclination, angle between the reference plane and the orbital plane, in degrees. **/
     public double i;
     /**
-     * The reference plane the elements are expressed in. Defaults to {@link OrbitReference#INHERITED},
-     * which keeps the historical behavior of deriving it from the trajectory's transform function or
-     * the parent's orientation.
+     * The reference plane the elements are expressed in. Defaults to {@link OrbitReference#INHERITED}.
      **/
     public OrbitReference reference = OrbitReference.INHERITED;
     /**
      * Optional explicit pole of the reference plane, as {right ascension, declination} in degrees.
-     * Overrides the pole that {@link #reference} would derive, and is the only way to express a
-     * {@link OrbitReference#LAPLACE} plane, which cannot be derived from the parent.
+     * The only way to express a {@link OrbitReference#LAPLACE} plane.
      **/
     public double[] referencePole;
     /** Longitude of the ascending node in degrees. **/
@@ -90,11 +87,8 @@ public class OrbitComponent {
     }
 
     /**
-     * Sets the reference plane of the elements from its name.
-     *
-     * @param reference One of INHERITED (default), PARENT_EQUATOR, PARENT_ORBITAL_PLANE, ECLIPTIC
-     *                  or LAPLACE, case-insensitive. Unknown values are reported and leave the
-     *                  reference untouched.
+     * Sets the reference plane of the elements from its name, case-insensitive. Unknown values are
+     * reported and leave the reference untouched.
      */
     public void setReference(String reference) {
         var r = OrbitReference.fromString(reference);
@@ -111,9 +105,7 @@ public class OrbitComponent {
     }
 
     /**
-     * Sets the explicit pole of the reference plane.
-     *
-     * @param pole Right ascension and declination of the pole, in degrees.
+     * Sets the explicit pole of the reference plane, in degrees.
      */
     public void setReferencePole(double[] pole) {
         this.referencePole = pole;

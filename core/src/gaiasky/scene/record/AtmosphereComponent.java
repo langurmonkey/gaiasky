@@ -211,10 +211,6 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     /**
      * Maps a vector from the scene frame into the frame of the rotating body, which is what the
      * scattering shader needs when the camera sits on the ground.
-     *
-     * @param v                         The vector to transform in place.
-     * @param rc                        The rotation component of the body.
-     * @param inverseRefPlaneTransform  Name of the inverse reference-plane transform of the body.
      */
     private void toPlanetFrame(Vector3D v,
                                RotationComponent rc,
@@ -286,15 +282,13 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
         translation.put(aux3);
         if (vrOffset != null) {
-            // vrOffset is in internal units (XrViewManager scales it by M_TO_U): subtracting a
-            // metres-valued copy here displaced the atmosphere camera by 1e9/S per unit of eye
-            // offset, i.e. about 3 km per 3 cm of eye offset at scale 1e4.
+            // vrOffset is in internal units, so subtracting a metres-valued copy displaced the
+            // atmosphere camera by 1e9/S per unit of eye offset.
             aux3.sub(vrOffset);
         }
 
-        // Distance from the eye to the planet centre, in internal units. The atmosphere writes it as
-        // its fragment depth: see atm.fragment.glsl for why it must be a distance in units and why
-        // it is the planet centre. Only the sky pass needs it - the ground shader has its own depth.
+        // Distance from the eye to the planet centre, in internal units: the atmosphere writes it
+        // as its fragment depth (see atm.fragment.glsl). Only the sky pass needs it.
         if (!ground) {
             float depthDist = (float) aux3.len();
             if (mat.has(AtmosphereAttribute.DepthDist))

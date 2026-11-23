@@ -210,13 +210,8 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     }
 
     /**
-     * Recomputes the camera-relative position of every element of the current mesh, in double
-     * precision, and re-uploads the vertex buffer. The Kepler solve depends on time only, so it is
-     * skipped while the time does not change; the reference-system transform is applied on every
-     * frame, because it moves with its parent.
-     *
-     * @param entity The first entity of the group, which carries the reference-system transform.
-     * @param tjd    Current time, in julian days.
+     * Recomputes the camera-relative position of every element of the current mesh in double
+     * precision and re-uploads the vertex buffer. The Kepler solve is skipped while time stands still.
      */
     private void updatePositions(Entity entity, double tjd) {
         if (verts == null || srcCount == 0) {

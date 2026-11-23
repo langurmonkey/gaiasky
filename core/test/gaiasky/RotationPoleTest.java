@@ -15,9 +15,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests the explicit rotation pole of a body: that the body is oriented with its rotation axis on
- * the pole, that a pole gives the same orientation as the legacy triple of ascending node, reference
- * plane and tilt, and that a body without a pole is left exactly as it was.
+ * Tests the explicit rotation pole of a body: the rotation axis lands on the pole, it matches the
+ * legacy node/tilt route, and a body without a pole is left untouched.
  */
 public class RotationPoleTest {
 
@@ -77,9 +76,7 @@ public class RotationPoleTest {
 
     @Test
     public void testThePoleAgreesWithTheLegacyTriple() {
-        // The old representation could reach these poles too, with a node and a tilt solved for the
-        // purpose. Both routes must land the body on the same axis, or switching the data over would
-        // move the body.
+        // The old representation could reach these poles too: both routes must land on the same axis.
         double[][] legacy = {
                 {281.010, 61.414, 11.010, 5.146719},
                 {40.589, 83.537, 130.589, -16.976281},

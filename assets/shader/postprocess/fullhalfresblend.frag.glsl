@@ -10,10 +10,8 @@ uniform sampler2D u_texture2;
 uniform sampler2D u_texture3;
 // Z-far and K values for depth buffer.
 uniform vec2 u_zFarK;
-// Distance, in internal units, below which a pixel counts as near-scene geometry: what the volume's
-// composed front and the kpc-scale bodies behind it must not be mistaken for. Comes from the CPU in
-// metres times M_TO_U, so it means the same physical distance at every DISTANCE_SCALE_FACTOR; the
-// 1e5 internal units it replaces were 670 AU on the desktop and 0.067 AU at scale 1e4.
+// Distance, in internal units, below which a pixel counts as near-scene geometry. Comes from the
+// CPU in metres times M_TO_U, so it means the same at every DISTANCE_SCALE_FACTOR.
 uniform float u_nearScene;
 
 in vec2 v_texCoords;

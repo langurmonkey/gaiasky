@@ -2463,8 +2463,7 @@ public class Settings extends SettingsObject {
         public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
         /**
          * Where the positions of the elements of an orbital elements group are computed, see
-         * {@link gaiasky.render.ElementsPath}. Applies immediately: both shader variants are always
-         * compiled and the meshes are rebuilt when it changes.
+         * {@link gaiasky.render.ElementsPath}. Applies immediately.
          **/
         public ElementsPath elementsPath = ElementsPath.AUTO;
 
@@ -3542,8 +3541,7 @@ public class Settings extends SettingsObject {
         public static class MacosSettings extends SettingsObject {
             /**
              * Enable the `gaiasky://` URL protocol handler. This initialises AWT, which takes over
-             * NSApplication: the native window controls (close, minimise, zoom) stop responding
-             * and the title bar switches to the light appearance. Disabled by default.
+             * NSApplication, so the window controls stop responding. Disabled by default.
              */
             public boolean urlProtocol = false;
 

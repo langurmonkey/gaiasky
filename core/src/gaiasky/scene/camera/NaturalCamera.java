@@ -72,10 +72,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
-     * One metre in internal units.
-     * <p>
-     * A method, not a constant: the value depends on the distance scale factor, which is
-     * initialised after the camera is built.
+     * One metre in internal units. A method, not a constant: it depends on the distance scale
+     * factor, which is initialised after the camera is built.
      */
     private static double minDist() {
         return Constants.M_TO_U;
@@ -96,8 +94,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private static final double MAX_DAMPING_BOOST = 1.0 / MIN_ALTITUDE_RATIO;
 
     /**
-     * Altitude at which the surface speed curve gives {@link #surfaceSpeed()}: one metre.
-     * See {@link #minDist()}.
+     * Altitude at which the surface speed curve gives {@link #surfaceSpeed()}: one metre, see
+     * {@link #minDist()}.
      */
     private static double speedScaleRefAltitude() {
         return Constants.M_TO_U;
@@ -284,16 +282,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Unit vector from the camera to the centre of the focus, computed at the beginning of the
-     * current frame together with {@link #distFromFocus}. Unlike {@link #focusDirection}, it is not
-     * affected by surface mode. Used by {@link #updateVelocity(double, double, double)} to prevent
-     * the camera from stepping past the focus object.
+     * frame. Unlike {@link #focusDirection} it is not affected by surface mode.
      */
     private final Vector3D camToFocusDir = new Vector3D();
 
     /**
-     * Set by {@link #updateVelocity(double, double, double)} when the current step lands the camera
-     * exactly on the focus clearance sphere. {@link #updatePosition(double, double, double)} zeroes
-     * the velocity after taking the step, so no motion is left over to bounce the camera back.
+     * Set when a step lands the camera exactly on the focus clearance sphere, so the velocity can be
+     * zeroed after the step and no motion is left over.
      */
     private boolean stopAfterStep = false;
 
@@ -384,31 +379,25 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private static final double DISTANCE_SMOOTHING_TAU = 0.1d;
 
     /**
-     * Maximum relative growth of the speed scaling, in e-folds per second, when the reference
-     * object changes in free mode. Focus mode skips it: see {@link #updateSmoothedDistances(double)}.
+     * Maximum relative growth of the speed scaling, in e-folds per second, when the reference object
+     * changes in free mode.
      */
     static final double DISTANCE_MAX_GROWTH_RATE = 1.5d;
 
     /**
-     * Maximum relative growth of the speed scaling, in e-folds per second, when the reference is the
-     * same and the distance only grows because the camera is flying away from it. That is real
-     * motion, not a discontinuity, so it may be much faster: leaving a star bubble takes about two
-     * seconds from the low limit to the top speed, against twenty at
-     * {@link #DISTANCE_MAX_GROWTH_RATE}.
+     * Maximum relative growth of the speed scaling, in e-folds per second, when the camera is merely
+     * flying away from an unchanged reference.
      */
     static final double DISTANCE_GROWTH_RATE = 12.0d;
 
     /**
-     * Factor by which the raw distance may grow from one frame to the next before the reference is
-     * assumed to have changed. A continuous fly-away grows the distance by a few percent per frame;
-     * a handoff or a culled body multiplies it by orders of magnitude.
+     * Factor by which the raw distance may change in one frame before the reference is assumed to
+     * have changed.
      */
     private static final double REFERENCE_JUMP_FACTOR = 4.0d;
 
     /**
-     * Hard cap on the growth of the smoothed distance in a single frame. Frame-rate safety net on
-     * top of the rate caps: a stall or a breakpoint would otherwise let a whole second worth of
-     * growth through at once.
+     * Hard cap on the growth of the smoothed distance in a single frame, on top of the rate caps.
      */
     private static final double DISTANCE_MAX_FRAME_RATIO = 4.0d;
 
@@ -418,12 +407,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double rawBodyDistance = Double.MAX_VALUE;
     /**
      * Raw (unsmoothed) smoothed-radius distance to the closest star, blended into
-     * {@link #regularDistance} with the low and high limits.
+     * {@link #regularDistance}.
      */
     private double rawStarDistance = Double.MAX_VALUE;
     /**
-     * Raw (unsmoothed) distance the camera uses when no star is nearby: the minimum of
-     * {@link #rawBodyDistance} and the focus distance.
+     * Raw distance the camera uses when no star is nearby: the minimum of {@link #rawBodyDistance}
+     * and the focus distance.
      */
     private double regularDistance = Double.MAX_VALUE;
     /**
@@ -956,9 +945,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         desired.set(direction)
                 .nor()
                 .scl(amount * speedScaling);
-        // Capped at the speed scale of this frame, not at a fixed magnitude in internal units: a fixed
-        // cap is a different physical speed at every distance scale factor, and at 1e6 it would hold
-        // the camera below a walking pace across the extragalactic sky.
+        // Capped at the speed scale of this frame: a fixed cap would be a different physical
+        // speed at every distance scale factor.
         vel.add(desired)
                 .clamp(0, FastMath.max(speedScaling, surfaceSpeed()));
         lastFwdTime = 0;
@@ -971,9 +959,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 .crs(up)
                 .nor()
                 .scl(amount * speedScaling);
-        // Capped at the speed scale of this frame, not at a fixed magnitude in internal units: a fixed
-        // cap is a different physical speed at every distance scale factor, and at 1e6 it would hold
-        // the camera below a walking pace across the extragalactic sky.
+        // Capped at the speed scale of this frame: a fixed cap would be a different physical
+        // speed at every distance scale factor.
         vel.add(desired)
                 .clamp(0, FastMath.max(speedScaling, surfaceSpeed()));
         lastFwdTime = 0;
@@ -989,9 +976,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         desired.set(up)
                 .nor()
                 .scl(amount * speedScaling);
-        // Capped at the speed scale of this frame, not at a fixed magnitude in internal units: a fixed
-        // cap is a different physical speed at every distance scale factor, and at 1e6 it would hold
-        // the camera below a walking pace across the extragalactic sky.
+        // Capped at the speed scale of this frame: a fixed cap would be a different physical
+        // speed at every distance scale factor.
         vel.add(desired)
                 .clamp(0, FastMath.max(speedScaling, surfaceSpeed()));
         lastFwdTime = 0;
@@ -1350,32 +1336,22 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             vel.clamp(0, multiplier * speedMultiplier);
 
-            // While the speed-up multiplier is active a single step must not carry the camera past the
-            // focus object, or it crosses it and the radius clamp parks it on the far side. Solid
-            // objects keep one radius of clearance (two radii from the centre) so the focus stays in
-            // view. Without the multiplier none of this applies: the regular radius clamp already
-            // prevents going below the surface, and landing has to work.
+            // A single step must not carry the camera past the focus object, or it crosses it and
+            // parks on the far side. Solid objects keep one radius of clearance.
             if (speedMultiplier > 1 && parent.mode.equals(CameraMode.FOCUS_MODE) && distFromFocus > 0 && dt > 0) {
                 double stopDist = focus.isSolidObject() ? focus.getRadius() * 2.0 : focus.getRadius();
                 double remaining = distFromFocus - stopDist;
                 double approach = vel.dot(camToFocusDir);
                 if (approach > 0) {
                     if (remaining > 0 && approach * dt > remaining) {
-                        // The step would cross the stop sphere. Prevent the overshoot by scaling the
-                        // whole velocity so the camera lands exactly on it: killing the velocity
-                        // instead would leave the camera a full step away (which, at speed-up speeds,
-                        // is a large fraction of the way), where it would then re-accelerate and
-                        // stall in a jitter. Scaling never reverses the velocity, so nothing bounces.
+                        // Scale the whole velocity so the camera lands exactly on the stop sphere:
+                        // killing it would leave the camera a step away, where it would jitter.
                         vel.scl(remaining / (approach * dt));
-                        // The velocity is huge here (one step), and the focus direction it is projected
-                        // onto on the next frame can change (in surface mode it is the pointer
-                        // direction), which would send the camera back at full speed. Wipe it out once
-                        // the step is taken.
+                        // The step's velocity is huge and would be re-projected next frame, so wipe
+                        // it out once the step is taken.
                         stopAfterStep = true;
                     } else if (remaining <= 0) {
-                        // Already inside the clearance band (landed, surface mode, or an object
-                        // without a solid clamp). Forbid getting closer, but let it move away and
-                        // sideways.
+                        // Already inside the clearance band: forbid getting closer, allow the rest.
                         vel.add(aux2.set(camToFocusDir)
                                         .scl(-approach));
                     }
@@ -1400,10 +1376,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         pos.add(aux1b);
 
         if (stopAfterStep) {
-            // The camera has just landed on the focus clearance sphere: kill all motion so it stays
-            // there. Without this the velocity of that last step survives, and the next frame it is
-            // re-projected onto the current focus direction (the pointer direction in surface mode),
-            // which shoots the camera away from the focus.
+            // Landed on the focus clearance sphere: kill all motion, or the last step's velocity
+            // gets re-projected and shoots the camera away.
             vel.setZero();
         }
 
@@ -1720,19 +1694,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Blends the closest-star distance into the distance the camera would use without a star
-     * nearby. A blend of 0 returns the star distance, a blend of 1 the regular distance, so each
-     * star only affects the speed inside its own bubble.
-     * <p>
-     * The mix is geometric, not linear: the two distances routinely differ by many orders of
-     * magnitude (a star radius against a distance of light years), and a linear mix would be
-     * dominated by the larger one and jump as soon as the blend leaves 0.
-     *
-     * @param starDistance    Distance to the closest star, in internal units.
-     * @param regularDistance Distance used when no star is nearby, in internal units.
-     * @param blend           Blend factor, in [0, 1].
-     *
-     * @return The blended distance, in internal units.
+     * Blends the closest-star distance into the regular one: 0 returns the star distance, 1 the
+     * regular one. Geometric, because the two are many orders of magnitude apart.
      */
     static double blendStarDistance(double starDistance,
                                     double regularDistance,
@@ -1753,14 +1716,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Interpolation factor between the low and high distance limits: 0 below the low limit, 1 above
-     * the high one, linear in between.
-     *
-     * @param distance The distance to interpolate.
-     * @param low      The low limit.
-     * @param high     The high limit.
-     *
-     * @return The interpolation factor, in [0, 1].
+     * Interpolation factor between the low and high limits: 0 below the low limit, 1 above the high
+     * one, linear in between.
      */
     static double starDistanceBlend(double distance,
                                     double low,
@@ -1778,16 +1735,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Sentinel for "no object to measure against this frame", so that it can never be mistaken for a
-     * real measurement: see {@link #updateSmoothedDistances(double)}, which holds the previous
-     * distance instead of feeding this through the filter.
-     * <p>
-     * Infinite, and not a large finite distance. A sentinel is compared against distances in
-     * internal units, so its value in physical terms moves with the distance scale factor: a fixed
-     * 1e20 units sat at 3.2 Gpc with the default factor, but only at 3.2 Mpc with 1e6, well inside
-     * the range of real measurements and below the saturation distance of the curve. Everything past
-     * the local group then read as "no reference", the smoothed distance stopped moving and the
-     * camera crawled across the extragalactic sky at whatever speed it had near the last star.
+     * Sentinel for "no object to measure against this frame": infinite, not a large finite distance,
+     * whose meaning would move with the distance scale factor.
      **/
     static final double NO_CLOSEST_BODY_DISTANCE = Double.POSITIVE_INFINITY;
 
@@ -1830,8 +1779,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Distance from the camera position to the given view, ignoring the cache the scene graph
-     * writes once per frame: that one is stale for a frame right after a teleport.
+     * Distance from the camera position to the given view, ignoring the once-per-frame cache of the
+     * scene graph, which is stale right after a teleport.
      */
     private double distanceToCamera(FocusView view) {
         // getAbsolutePosition leaves the output untouched for entities without a body component.
@@ -1856,11 +1805,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         var focusDistance = getMode().isFocus() && focus != null ? distanceToCamera(focus) : Double.MAX_VALUE;
 
-        // Distance the camera uses with no star nearby: what it uses with the star distance
-        // scaling off entirely. Anything past DIST_SMOOTH_UP maps to the same speed, so the
-        // saturation distance is used as the reference there instead of infinity: otherwise the
-        // star would be blended against an almost infinite distance and could never slow the
-        // camera down in empty space, which is precisely where it has to.
+        // What the camera uses with the star distance scaling off. Past DIST_SMOOTH_UP every
+        // distance maps to the same speed, so the saturation distance is the reference.
         regularDistance = FastMath.min(DIST_SMOOTH_UP, FastMath.min(rawBodyDistance, focusDistance));
 
         rawStarDistance = getClosestStarDistance(regularDistance);
@@ -1907,23 +1853,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Advances the exponential low-pass filter of the raw distance. This must be called exactly
-     * once per frame, so that the filtering does not depend on the number of times
-     * {@link #speedScaling(double)} is invoked.
-     *
-     * @param dt The frame delta time, in seconds.
+     * Advances the filter of the raw distance. Must be called exactly once per frame, so that the
+     * smoothing does not depend on how often {@link #speedScaling(double)} is called.
      */
     private void updateSmoothedDistances(double dt) {
         double raw = computeRawDistances();
 
-        // A frame with no object to measure against is "unknown", not "infinitely far". Feeding a
-        // huge distance through the filter multiplied the speed - which is linear in this distance -
-        // by the ratio between it and the last real reference in a single frame, and the exponential
-        // smoothing cannot reject it, it can only decay it, which takes seconds at the top speed.
-        // Bodies are only registered as the closest one when they are extracted, i.e. when they are
-        // actually drawn (ModelExtractor, ParticleExtractor), so this happens routinely when leaving
-        // a system and the bodies fade out or are culled. Holding the last value keeps the speed
-        // where it was.
+        // No object to measure against is "unknown", not "infinitely far": feeding a huge distance
+        // through the filter multiplied the speed in a single frame. Hold the last value instead.
         if (!Double.isFinite(raw)) {
             if (smoothedDistance < 0 || !Double.isFinite(smoothedDistance)) {
                 smoothedDistance = 0;
@@ -1950,9 +1887,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             return;
         }
 
-        // Only a discontinuity in the raw distance means that the reference changed. A gradual one
-        // means that the very same reference is getting farther away, so the camera is simply flying
-        // out of its neighbourhood and the speed has to follow, not crawl up to it.
+        // Only a discontinuity means the reference changed; a gradual change is the camera flying
+        // away from the same reference, and the speed has to follow.
         double rate = raw > smoothedDistance * REFERENCE_JUMP_FACTOR
                 ? DISTANCE_MAX_GROWTH_RATE
                 : DISTANCE_GROWTH_RATE;
@@ -1971,16 +1907,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Bounds the relative growth of a smoothed distance. The speed scaling is linear in this
-     * distance, so bounding its growth bounds the growth of the speed. The decay is deliberately
-     * left unbounded - slowing down when something gets closer has to be immediate.
-     *
-     * @param current The current smoothed distance.
-     * @param next    The distance the filter wants to move to.
-     * @param dt      The frame delta time, in seconds.
-     * @param rate    Maximum growth, in e-folds per second.
-     *
-     * @return The next distance, with its growth limited.
+     * Bounds the relative growth of a smoothed distance, which bounds the growth of the speed. The
+     * decay is left unbounded: slowing down when something gets closer has to be immediate.
      */
     static double limitGrowth(double current,
                               double next,
@@ -1995,13 +1923,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Radius multiplier at which the closest-star distance starts blending in. Below
+     * Radius multiplier at which the closest-star distance starts blending in: below
      * {@code starRadius * this} the star distance is used as is.
      */
     private double starDistanceScaleLow = 5.0E4;
     /**
-     * Radius multiplier at which the closest-star distance has fully faded out. Above
-     * {@code starRadius * this} the closest star no longer influences the distance.
+     * Radius multiplier at which the closest-star distance has fully faded out.
      */
     private double starDistanceScaleHigh = 4.0E7;
 
@@ -2027,14 +1954,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Distance to the closest star, blended into the regular distance with the low and high radius
-     * multipliers. Below the low limit the star distance is used as is, above the high limit it is
-     * ignored, and in between the two are mixed: each star slows the camera down only inside its
-     * own bubble.
-     *
-     * @param regularDistance The distance the camera uses when no star is nearby, in internal units.
-     *
-     * @return The blended distance, or {@link Double#MAX_VALUE} if the star distance is not to be
-     * used at all.
+     * multipliers. Returns {@link Double#MAX_VALUE} when the star distance is not to be used.
      */
     private double getClosestStarDistance(double regularDistance) {
         if (getMode().isFocus() || !GaiaSky.settings().scene.camera.starDistanceScaling) {
@@ -2058,20 +1978,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Snapshot of the closest-star distance scaling, for the star distance window. Read-only: it
      * does not modify any camera state.
-     *
-     * @param starName         Name of the closest star, or null if there is none.
-     * @param radius           Radius of the closest star, in internal units.
-     * @param starDistance     Distance to the closest star, in internal units.
-     * @param limitLow         Low limit, {@code radius * starDistanceScaleLow}, in internal units.
-     * @param limitHigh        High limit, {@code radius * starDistanceScaleHigh}, in internal units.
-     * @param blend            0 when the star distance is used as is, 1 when it is ignored.
-     * @param starContribution Star distance blended into the regular distance, in internal units.
-     * @param regularDistance  Distance used when no star is nearby, in internal units.
-     * @param rawDistance      Raw (unsmoothed) distance of the current frame, in internal units.
-     * @param smoothedDistance Smoothed distance, in internal units.
-     * @param speedScale       Current speed scaling, in internal units per second.
-     * @param enabled          Whether the star distance scaling setting is on.
-     * @param mode             Current camera mode.
      */
     public record StarDistanceDebug(String starName,
                                     double radius,
@@ -2089,10 +1995,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Builds a snapshot of the closest-star distance scaling inputs and outputs for the star
-     * distance window.
-     *
-     * @return The snapshot. Never null; the star fields are NaN when there is no closest star.
+     * Builds the snapshot the star distance window reads. The star fields are NaN when there is no
+     * closest star.
      */
     public StarDistanceDebug starDistanceDebug() {
         var star = proximity != null ? proximity.effective[0] : null;
@@ -2150,20 +2054,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Maps the distance to the nearest reference object to a speed scaling. Kept separate from
-     * {@link #speedScaling(double)} so that the curve can be tested without a camera.
-     * <p>
-     * Linear up to {@link #SPEED_SCALE_FAR_KNEE_M}, then a power law with
-     * {@link #SPEED_SCALE_FAR_EXPONENT} up to {@link #SPEED_SCALE_FAR_LINEAR_KNEE_M}, then linear
-     * again out to the extragalactic regime. The branches meet at both knees, and all of them are
-     * scale invariant: the knees are converted to units with the current {@link Constants#M_TO_U},
-     * so the curve means the same physical distance at every distance scale factor.
-     *
-     * @param distance     Distance to the nearest reference, in internal units.
-     * @param distSmoothUp Distance at which the linear part of the curve saturates, in internal
-     *                     units.
-     *
-     * @return The speed scaling, in internal units per second.
+     * Maps the distance to the nearest reference to a speed scaling, scale invariant because the
+     * knees are converted with the current {@link Constants#M_TO_U}.
      */
     static double distanceToSpeedScale(double distance,
                                        double distSmoothUp) {
@@ -2181,11 +2073,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double atKnee = MAX_SPEED_SCALING * knee / distSmoothUp;
         double far = atKnee * Math.pow(distance / knee, SPEED_SCALE_FAR_EXPONENT);
 
-        // Out at the extragalactic scales the power law grows too slowly to cross a survey volume, so
-        // the curve goes back to the linear one, which keeps the crossing time constant at every
-        // scale and reaches the ceiling at distSmoothUp. The exponent branch is blended into it over
-        // a decade of distance, so that the camera accelerates instead of jumping in speed where the
-        // two branches meet.
+        // Out at the extragalactic scales the power law is too slow, so the curve goes back to the
+        // linear one, blended over a decade so the camera accelerates instead of jumping.
         double farLinearKnee = SPEED_SCALE_FAR_LINEAR_KNEE_M * Constants.M_TO_U;
         if (farLinearKnee > knee && distance > farLinearKnee) {
             double t = Math.log10(distance / farLinearKnee) / SPEED_SCALE_FAR_LINEAR_RAMP_DECADES;
@@ -2208,16 +2097,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double speed = GaiaSky.settings().scene.camera.speed;
 
         if (dist < speedScaleRefAltitude()) {
-            // Very close to a surface: use the logarithmic curve. It is already in internal units per
-            // second, because the surface speed it is built on is a physical speed converted with the
-            // current distance scale factor. Multiplying it by the factor again would make the camera
-            // fly at a walking pace times the factor.
+            // Very close to a surface: the logarithmic curve, already in internal units per second,
+            // because the surface speed it is built on is a physical speed.
             return FastMath.max(altitudeToSpeedScale(dist), min) * speed;
         }
 
-        // Far from any surface: linear near, sub-linear once out of the solar system. This curve is
-        // built out of ratios of internal distances, so it is scale invariant by itself and the
-        // factor has to be applied here, once.
+        // Far from any surface: linear near, sub-linear out of the solar system. The curve is built
+        // from ratios of distances, so the factor is applied here, once.
         double distanceMap = smoothedDistance >= 0 ? distanceToSpeedScale(smoothedDistance, DIST_SMOOTH_UP) : 0;
 
         return distanceMap > 0 ? Math.max(distanceMap, min) * speed * Constants.DISTANCE_SCALE_FACTOR : 0;

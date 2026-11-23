@@ -18,25 +18,8 @@ import net.jafama.FastMath;
 import java.util.stream.IntStream;
 
 /**
- * Computes the position of the elements of an orbital elements group in double precision and
- * writes them into the float buffer the vertex shader reads.
- * <p>
- * The vertex shader used to solve Kepler's equation, the trigonometry and the reference-system
- * transform in double-float emulation, four times per element (once per quad vertex). This class
- * does the same work once per element, in real doubles, and leaves the shader with a single
- * billboard expansion.
- * <p>
- * The work is split in two stages:
- * <ul>
- *     <li>{@link #compile(Object[], int)} runs once, when the dataset is built: it converts the
- *     orbital elements to radians, builds the rotation from the perifocal to the equatorial plane
- *     and folds the radius and the unit conversion into constants. None of that depends on time.</li>
- *     <li>{@link #compute(double)} runs every frame. While the time advances in small steps (the
- *     usual case), it advances the eccentric anomaly from the value found on the previous frame
- *     instead of solving Kepler's equation from scratch, which removes the trigonometry from the
- *     inner loop. It resynchronizes periodically, and also whenever the time step is too large or
- *     goes backwards. The position is written straight into the vertex buffer, in the same pass.</li>
- * </ul>
+ * Computes the positions of an orbital elements group in double precision and writes them into the
+ * float buffer the vertex shader reads, advancing the eccentric anomaly from the previous frame.
  */
 public class ElementPositions {
 
@@ -79,10 +62,6 @@ public class ElementPositions {
     /**
      * Prepares the given elements for fast evaluation. Must be called before
      * {@link #compute(double, float[], int, int, int)}.
-     *
-     * @param src   Sources, in instance order. Each one is a {@link ParticleKepler} or an
-     *              {@link OrbitComponent}. Unrecognized entries are left at the origin.
-     * @param count Number of elements.
      */
     public void compile(Object[] src,
                         int count) {
@@ -112,16 +91,6 @@ public class ElementPositions {
     /**
      * Computes the position of every element at the given time, in internal units, and writes the
      * camera-relative float position into the vertex (or instance) buffer in the same pass.
-     *
-     * @param tjd     Current time, in julian days.
-     * @param buf     The float buffer, with {@code stride} floats per vertex.
-     * @param stride  Floats per vertex (or per instance).
-     * @param offset  Offset of the position attribute within a vertex, in floats.
-     * @param repeat  Consecutive vertices that share an element position: 1 when the buffer holds
-     *                one instance per element, 4 for a quad per element.
-     * @param refSys  Reference-system transform, or null for the identity.
-     * @param dataPos Dataset origin, camera-relative, or null for the origin.
-     * @param affine  Arbitrary affine transformation, or null.
      */
     public void compute(double tjd,
                         float[] buf,
@@ -159,16 +128,7 @@ public class ElementPositions {
 
     /**
      * Rewrites the float positions from the dataset-frame positions found by the last call to
-     * {@link #compute(double, float[], int, int, int)}. Used when the time has not changed but the
-     * reference system, the affine transformation or the dataset origin have.
-     *
-     * @param buf     The float buffer, with {@code stride} floats per vertex.
-     * @param stride  Floats per vertex (or per instance).
-     * @param offset  Offset of the position attribute within a vertex, in floats.
-     * @param repeat  Consecutive vertices that share an element position.
-     * @param refSys  Reference-system transform, or null for the identity.
-     * @param dataPos Dataset origin, camera-relative, or null for the origin.
-     * @param affine  Arbitrary affine transformation, or null.
+     * {@link #compute(double, float[], int, int, int)}. Used when only the transforms have changed.
      */
     public void project(float[] buf,
                         int stride,
@@ -188,16 +148,8 @@ public class ElementPositions {
     }
 
     /**
-     * Builds the combined transform, in the same order and with the same conventions the elements
-     * vertex shader uses:
-     * <pre>
-     *     pos = u_transform * (keplerToCartesian() * u_refSysTransform) + u_datasetPos;
-     * </pre>
-     * The reference system is multiplied as a row vector ({@code v * M}), which reads the bottom row
-     * of the matrix and therefore does not apply its translation, while the affine transformation is
-     * multiplied as a column vector ({@code M * v}) and does. Both are folded into a single 3x4 array
-     * so that a single multiply per element is left, and the layout of the array is the one the inner
-     * loops use: {@code out_i = sum_j p_j * mtx[4*i + j]}, with the offset in the fourth column.
+     * Builds the combined transform as the elements vertex shader applies it (the ref sys as a row
+     * vector, the affine as a column one), folded into a single 3x4 array.
      */
     private void setTransform(Matrix4D refSys,
                               Matrix4D affine) {
@@ -209,10 +161,8 @@ public class ElementPositions {
             mtx = new double[12];
         }
         if (affine == null) {
-            // A row-vector multiply takes its coefficients from the rows of the transposed matrix,
-            // which is exactly the layout of the values, so no rearrangement is needed. The
-            // translation of an affine matrix lives in the fourth column and is not applied, which
-            // is what the shader does too.
+            // A row-vector multiply reads the rows of the transposed matrix, which is the layout of
+            // the values, so no rearrangement is needed and the translation is not applied.
             System.arraycopy(refSys.val, 0, mtx, 0, 12);
             return;
         }
@@ -318,12 +268,8 @@ public class ElementPositions {
     }
 
     /**
-     * Starting point for a cold solve of Kepler's equation. Newton converges from the mean anomaly
-     * for low eccentricity, but for a highly eccentric orbit it needs to start near the apoapsis.
-     *
-     * @param m Mean anomaly, in radians.
-     * @param e Eccentricity.
-     * @return The initial guess for the eccentric anomaly, in radians.
+     * Starting point for a cold solve of Kepler's equation: the mean anomaly for low eccentricity,
+     * near the apoapsis for high.
      */
     private static double initialGuess(double m,
                                        double e) {
@@ -332,11 +278,6 @@ public class ElementPositions {
 
     /**
      * Solves Kepler's equation, M = E - e sin E, starting from the given seed.
-     *
-     * @param m    Mean anomaly, in radians.
-     * @param e    Eccentricity.
-     * @param seed Initial guess for the eccentric anomaly, in radians. Must be finite.
-     * @return The eccentric anomaly, in radians.
      */
     private static double solveKepler(double m,
                                       double e,
@@ -391,9 +332,8 @@ public class ElementPositions {
                 cosE[i] = cos;
                 sinE[i] = sin;
             } else {
-                // Advance both anomalies from the previous frame. They cross 2 pi at the same time,
-                // so a single wrap keeps them in the same turn and the residual stays a small
-                // angle rather than a whole revolution.
+                // Both anomalies wrap at 2 pi at the same time, so a single wrap keeps the residual a
+                // small angle rather than a whole revolution.
                 double m = meanAnomaly[i] + n * dt;
                 double ecc = eccAnomaly[i];
                 if (m >= PI2) {
@@ -407,10 +347,8 @@ public class ElementPositions {
                 sin = sinE[i];
                 for (int it = 0; it < 3; it++) {
                     double dE = -(ecc - e * sin - m) / (1d - e * cos);
-                    // Rotate by dE with the series of its sine and cosine, truncated at the fifth
-                    // order: the error is below 1e-19 for the largest step accepted here, which is
-                    // what lets the orbit be advanced without calling the trigonometry. The series
-                    // is orthonormal to that order, so no renormalization is needed.
+                    // Rotate by dE with its sine and cosine series truncated at the fifth order: the
+                    // error is below 1e-19 for the largest step accepted, so no renormalization.
                     double d2 = dE * dE;
                     double cosD = 1d - 0.5 * d2 + d2 * d2 * INV_24;
                     double sinD = dE * (1d - d2 * INV_6 + d2 * d2 * INV_120);

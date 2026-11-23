@@ -100,35 +100,22 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     public VirtualTextureComponent diffuseSvt;
     public Map<Object, Object> svtParams;
     /**
-     * Whether this cloud layer is rendered by raymarching the volume between the planet surface and
-     * the shell, instead of shading the shell. Opt-in per body: set {@code "volumetric": true} in the
-     * {@code cloud} object of the scene graph. See
-     * {@code assets/shader/cloud/volumetric.glsl} and {@code notes/gaiasky-volumetric-clouds-brief.md}.
+     * Whether this layer is raymarched instead of shaded. Opt-in per body: {@code "volumetric": true}.
      **/
     public boolean volumetric = false;
     /**
-     * Radius of the cloud sphere in the model's own units: half the {@code diameter} model parameter
-     * (2.0 for the planets, which is 1.0). The volumetric march needs it to place the top of the
-     * layer in the object's frame; see {@link ModelComponent#updateCloudShell(double, CloudComponent)}.
+     * Radius of the cloud sphere in the model's own units: half the {@code diameter} parameter. The
+     * march needs it to place the top of the layer in the object's frame.
      **/
     public float modelRadius = 0.5f;
     /**
-     * Thickness of a volumetric layer, in km. Negative means "derive it from the planet radius"
-     * (see {@link #DEFAULT_VOLUMETRIC_THICKNESS}). Real cloud decks are 2-15 km thick, which is a
-     * fifth of a percent of a terrestrial planet and reads as a flat shell from orbit; the default
-     * exaggerates it to the point where the layer has visible depth.
+     * Thickness of a volumetric layer, in km. Negative derives it from the planet radius. Real decks
+     * are 2-15 km thick; the default exaggerates it so the layer has visible depth.
      **/
     public double volumetricThicknessKm = -1;
     /**
-     * Default thickness of a volumetric layer, as a fraction of the planet radius. 1 % is about
-     * 64 km on Earth.
-     * <p>
-     * This is the marching slab, not the cloud: the deck itself occupies a band inside it (see
-     * {@code VC_BASE} in {@code assets/shader/cloud/volumetric.glsl}), with clear air below and
-     * above. A real deck is 2-15 km thick, which is a fifth of a percent of the radius and has no
-     * room for structure, so the slab is exaggerated; but exaggerating it to the point where the
-     * band reaches the ground makes the clouds look like fog on the surface, so 1 % is the
-     * compromise.
+     * Default thickness of a volumetric layer, as a fraction of the planet radius: 1 % is about
+     * 64 km on Earth. This is the marching slab; the deck itself occupies a band inside it.
      **/
     public static final double DEFAULT_VOLUMETRIC_THICKNESS = 0.010;
     /** Mode type. **/
@@ -210,10 +197,8 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     public void doneLoading(AssetManager manager) {
         this.manager = manager;
 
-        // The marched layer draws the *far* wall of its proxy, so that there is a fragment whether
-        // the camera is outside the volume or has flown into it - the aurora's arrangement. That
-        // needs the sphere flipped; the shell path keeps the winding its texture was authored with.
-        // The map is copied first: it can be shared with other bodies through the archetype.
+        // The marched layer draws the far wall of its proxy, so there is a fragment whether the
+        // camera is outside or inside; the shell path keeps its own winding.
         if (volumetric) {
             var params = modelParams != null ? new HashMap<>(modelParams) : createUVSphereParameters(400, 2.0, false);
             params.put("flip", true);
@@ -316,15 +301,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
     /**
      * Binds the full-resolution scene depth to the marched material, so the march stops at whatever
-     * is already drawn in front of the layer. Attributes as the volume path uses them
-     * ({@link MaterialComponent#setVolumeDepthMask}): the depth in
-     * {@code TextureAttribute.VolumeSceneDepth}, the texels per fragment in
-     * {@code Vector2Attribute.VolumeDepthMaskScale}. Cached, because the attributes are set on the
-     * material and adding them every frame would recompile.
-     *
-     * @param scene  The scene depth texture.
-     * @param scaleX Mask texels per fragment, x. 1 for a full-resolution pass.
-     * @param scaleY Mask texels per fragment, y.
+     * is already drawn in front of the layer. Cached, because adding attributes recompiles.
      */
     public void setSceneDepth(Texture scene,
                               float scaleX,
@@ -397,9 +374,8 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         // single compiled program for all of them.
         material.set(new FloatAttribute(FloatAttribute.CloudVolumetric, volumetric ? 1f : 0f));
         if (volumetric) {
-            // The march outputs straight alpha and a real transmittance, which is ordinary alpha
-            // blending. The shell path uses COLOR, which assumes an opaque shell and would make the
-            // volume double-count the surface behind it.
+            // The march outputs straight alpha, which is ordinary alpha blending. The shell path
+            // uses COLOR, which assumes an opaque shell and would double-count the surface.
             mc.setBlendMode(BlendMode.ALPHA);
         }
 
@@ -545,10 +521,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     }
 
     /**
-     * Sets the thickness of the volumetric layer, in km. Only meaningful together with
-     * {@link #setVolumetric(Boolean)}; ignored by the shell path.
-     *
-     * @param thicknessKm Thickness in km, or {@code null} to derive it from the planet radius.
+     * Sets the thickness of the volumetric layer, in km. Ignored by the shell path.
      */
     public void setThickness(Double thicknessKm) {
         this.volumetricThicknessKm = thicknessKm == null ? -1 : thicknessKm;
@@ -556,9 +529,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
     /**
      * Thickness of the volumetric layer for a body of the given radius, in internal units.
-     *
-     * @param planetRadius Radius of the body, in internal units.
-     * @return The thickness, in internal units.
      */
     public double getVolumetricThickness(double planetRadius) {
         return volumetricThicknessKm > 0
@@ -580,8 +550,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
     /**
      * Sets whether the cloud layer is raymarched. Opt-in per body.
-     *
-     * @param volumetric Whether to march the shell instead of shading it.
      */
     public void setVolumetric(Boolean volumetric) {
         this.volumetric = volumetric != null && volumetric;

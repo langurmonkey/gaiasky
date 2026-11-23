@@ -47,11 +47,8 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
      **/
     public double meridianAngle;
     /**
-     * Pole of the rotation axis, as {right ascension, declination} in degrees in the equatorial frame
-     * of J2000. When present it supersedes {@link #ascendingNode}, {@link #inclination} and
-     * {@link #axialTilt}, and the body is oriented straight from the published pole. Note that the
-     * pole carries the sense of the rotation: a retrograde body has a negative {@link #period} about
-     * its north pole, rather than the opposite pole and a positive period.
+     * Pole of the rotation axis, as {right ascension, declination} in degrees, J2000. Supersedes
+     * node, inclination and axial tilt. A retrograde body has a negative {@link #period}.
      **/
     public double[] pole;
 
@@ -150,32 +147,23 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
     }
 
     /**
-     * Sets the pole of the rotation axis.
-     *
-     * @param pole Right ascension and declination of the pole, in degrees, in the equatorial frame of
-     *             J2000.
+     * Sets the pole of the rotation axis, in degrees, in the equatorial frame of J2000.
      */
     public void setPole(double[] pole) {
         this.pole = pole != null && pole.length >= 2 ? new double[]{pole[0], pole[1]} : null;
     }
 
     /**
-     * Whether the body declares its rotation pole explicitly, in which case the ascending node, the
-     * inclination and the axial tilt are not used.
+     * Whether the body declares its rotation pole explicitly, in which case node, inclination and
+     * axial tilt are not used.
      */
     public boolean hasExplicitPole() {
         return pole != null && pole.length >= 2;
     }
 
     /**
-     * Builds the orientation of the body, the matrix that takes its local axes into the equatorial
-     * frame of the scene. The Y axis of the result is the rotation axis of the body.
-     *
-     * @param refPlaneTransform Name of the reference-plane transform of the body, only used when no
-     *                          explicit pole is given.
-     * @param out               The matrix to write the result into.
-     *
-     * @return The output matrix.
+     * Builds the orientation of the body: the matrix that takes its local axes into the equatorial
+     * frame. The Y axis of the result is the rotation axis.
      */
     public Matrix4D getOrientation(String refPlaneTransform, Matrix4D out) {
         if (hasExplicitPole()) {

@@ -31,23 +31,8 @@ void main(void) {
 
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
-    // Write a constant depth instead of the per-fragment one, so that the motion blur reconstructs
-    // one consistent world position for all atmosphere pixels.
-    //
-    // The value is the distance to the planet centre, in internal units. It used to be
-    // `getDepthValue(fOuterRadius, ...)`, which passed 1.025 *planet radii* where a distance in
-    // units belongs: 1.025 units is 1.03e6 km at distanceScaleDesktop 1 (well behind the disc, so
-    // the depth test kept the shell behind the ground and it only showed past the limb) but 102 km
-    // at 1e4 (well in front of everything, so the shell painted over the whole disc and rejected
-    // the clouds, which are drawn after it). The crossover is at the scale that makes 1 unit equal
-    // the eye-to-ground distance, i.e. a few times ten - which is why 1e1 looked right and 1e2 did
-    // not, and why every larger scale looked the same.
-    //
-    // The centre is behind every point of the planet's visibile disc and of the cloud deck at any
-    // altitude, and in front of the far plane, so this reproduces the scale-1 behaviour everywhere.
-    // Still constant per body, and still a depth that is not geometry: the half-resolution pass copies
-    // the scene depth into a snapshot of its own before this shader runs
-    // (SceneRenderer#snapshotDepth) and tests its content against that copy.
+    // Constant depth: the distance to the planet centre in internal units, which reproduces the
+    // scale-1 behaviour at every distance scale (see SceneRenderer#snapshotDepth).
     gl_FragDepth = getDepthValue(u_depthDist, u_cameraNearFar.y, u_cameraK);
 
     #ifdef ssrFlag

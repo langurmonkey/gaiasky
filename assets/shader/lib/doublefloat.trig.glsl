@@ -1,9 +1,7 @@
 #ifndef GLSL_LIB_DOUBLEFLOAT_TRIG
 #define GLSL_LIB_DOUBLEFLOAT_TRIG
-// Sine and cosine of a double-float angle.
-// Requires doublefloat.glsl, which must be included first.
-// Keep in its own file: the 32-entry table is dead weight for shaders that
-// only need the arithmetic.
+// Sine and cosine of a double-float angle. Requires doublefloat.glsl first; in its own file so
+// shaders that only need the arithmetic do not pay for the table.
 
 // pi/16 as a double-float
 const vec2 DS_PI16 = vec2(0.19634954631328583, -5.463923535842241e-09);

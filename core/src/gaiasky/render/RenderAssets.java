@@ -125,9 +125,8 @@ public class RenderAssets {
                                       "shader/billboard.fragment.glsl",
                                       TextUtils.concatAll("regular.billboard", names),
                                       defines);
-        // Near-field stars get their own program: the quad is oriented like every
-        // other billboard, but shaded in apparent radii by lib/starnear.glsl, and
-        // the vertex stage also passes the world-space axes the surface needs.
+        // Near-field stars get their own program: same billboard, shaded in apparent radii by
+        // lib/starnear.glsl, with the world-space axes passed to the surface.
         billboardStarDesc = loadShaderExt(manager,
                                           "shader/star.billboard.vertex.glsl",
                                           "shader/star.billboard.fragment.glsl",
@@ -194,11 +193,8 @@ public class RenderAssets {
                                       "shader/particle.group.quad.fragment.glsl",
                                       TextUtils.concatAll("orbitelem", names),
                                       defines);
-        // Same source, compiled with the vertex shader solving the orbits. It gets the double-float
-        // helpers without their optimization barrier: this path recomputes every position from
-        // scratch on every frame, so the barrier buys nothing and costs a lot. Both variants are
-        // always compiled, like the tessellation programs, so that the path can be chosen after
-        // this point: the setting is read when a mesh is built, not here.
+        // Same source, with the vertex shader solving the orbits: the double-float helpers are
+        // compiled without their barrier, which buys nothing on a path that recomputes everything.
         orbitElemGpuDesc = loadShaderExt(manager,
                                          "shader/particle.group.elements.quad.vertex.glsl",
                                          "shader/particle.group.quad.fragment.glsl",
@@ -434,9 +430,7 @@ public class RenderAssets {
          */
         orbitElemShaders = fetchShaderProgramExt(manager, orbitElemDesc, TextUtils.concatAll("orbitelem", names));
 
-        /*
-         * ORBITAL ELEMENTS GROUP, GPU PATH - default and relativistic
-         */
+        /* ORBITAL ELEMENTS GROUP, GPU PATH - default and relativistic */
         orbitElemGpuShaders = fetchShaderProgramExt(manager, orbitElemGpuDesc, TextUtils.concatAll("orbitelem.gpu", names));
 
         // Per-vertex lighting shaders

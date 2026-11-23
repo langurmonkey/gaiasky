@@ -158,20 +158,18 @@ public enum RenderGroup {
      **/
     BILLBOARD_GAL(5400),
     /**
-     * Star billboards, colour pass. Drawn late, after the orbital elements and the small bodies, so
-     * the star is occluded by whatever is in front of it. The star body itself occludes the late
-     * elements through {@link #BILLBOARD_STAR_DEPTH}.
-     **/
+     * Star billboards, colour pass. Drawn late so the star is occluded by what is in front of it;
+     * the star body occludes the late elements through {@link #BILLBOARD_STAR_DEPTH}.
+     */
     BILLBOARD_STAR(5500),
     /**
-     * Depth-only pre-pass of the star billboards. Drawn early, so the solid photosphere is in the
-     * depth buffer before the labels, lines and the rest of the late geometry.
+     * Depth-only pre-pass of the star billboards, drawn early so the photosphere is in the depth
+     * buffer before the labels and lines.
      **/
     BILLBOARD_STAR_DEPTH(2050),
     /**
-     * Volumetric clouds, raymarched. Drawn before the atmosphere, so that aerial perspective is
-     * applied on top of them rather than the other way round. See
-     * {@code gaiasky.scene.record.CloudComponent#volumetric}.
+     * Volumetric clouds, raymarched. Drawn before the atmosphere, so aerial perspective lands on
+     * top of them.
      **/
     MODEL_CLOUD_VOLUMETRIC(5900),
     /**

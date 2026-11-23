@@ -19,18 +19,8 @@ layout(location = 0) in vec4 a_position;
 layout(location = 1) in vec2 a_texCoord0;
 
 /*
- * There are two ways to place the elements of the group, selected by the elementsGpuPath define.
- *
- * GPU (default everywhere except macOS): the orbital elements are uploaded once and Kepler's
- * equation is solved here, in the vertex shader, for the current time. The mean anomaly is
- * accumulated in emulated double precision to keep the reduced anomaly accurate over long spans,
- * the solve and the rotation that follows stay in single precision. The double-float helpers are
- * compiled without their optimization barrier (DS_NO_BARRIER), which is what makes this path fast.
- * It recomputes each position from scratch on every frame, which some drivers (macOS) cannot keep
- * stable, and the elements visibly jitter there.
- *
- * CPU: the position arrives ready, camera-relative and in internal units, computed in double
- * precision in ElementPositions. This shader only expands the billboard.
+ * elementsGpuPath: GPU solves Kepler here from elements uploaded once (fast, but some drivers
+ * jitter); CPU takes the camera-relative position ready from ElementPositions.
  */
 #ifdef elementsGpuPath
 #include <shader/lib/doublefloat.glsl>
@@ -50,9 +40,7 @@ layout(location = 6) in float a_textureIndex;
 #else
 // Instanced attributes
 layout(location = 2) in vec4 a_color;
-// Camera-relative position of the element, in internal units. Computed on the CPU in
-// double precision (see ElementPositions), so that Kepler's equation, the reference
-// system transform and the dataset origin never touch a float intermediate.
+// Camera-relative position, in internal units, computed on the CPU in double precision.
 layout(location = 3) in vec3 a_pos;
 layout(location = 4) in float a_size;
 layout(location = 5) in float a_textureIndex;

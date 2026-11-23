@@ -984,20 +984,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     /**
-     * Runs the given callback as soon as the material exists, or immediately if it already does.
-     * <p>
-     * With lazy texture initialisation the material is built in
-     * {@link gaiasky.scene.record.ModelComponent#touch(com.badlogic.gdx.math.Matrix4)}, i.e. the
-     * first frame the entity is drawn, which is well after set-up. Without it the material is built
-     * in {@code doneLoading}, and a material attached after that - a procedural volume's, created by
-     * the volume initializer - is built by the same {@code touch} instead. Either way it is well
-     * after set-up, so anything that contributes attributes to the material has to go through here
-     * rather than assume it can do it at {@code setUpEntity} time.
-     * <p>
-     * The callback runs on the GL thread, either in the caller's thread (already initialised) or
-     * inside {@link #initMaterial}. It is dropped if the material never arrives.
-     *
-     * @param listener The callback.
+     * Runs the given callback as soon as the material exists, or immediately if it already does. The
+     * material is built well after set-up, so anything contributing attributes has to go through here.
      */
     public void whenMaterialInitialized(Runnable listener) {
         materialInitQueue.whenReady(listener);

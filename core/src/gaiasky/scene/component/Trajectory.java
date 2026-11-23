@@ -37,9 +37,8 @@ public class Trajectory implements Component {
     public double alpha;
     public Matrix4D localTransformD = new Matrix4D();
     /**
-     * Resolved reference frame for trajectories whose orbital elements declare their reference plane
-     * explicitly (see {@link gaiasky.scene.record.OrbitComponent#reference}). Null when not computed
-     * yet, and unused for the inherited reference. The plane is constant, so it is resolved once.
+     * Resolved frame of trajectories whose elements declare their reference plane explicitly (see
+     * {@link gaiasky.scene.record.OrbitComponent#reference}). Null when not computed yet.
      **/
     public Matrix4D referenceFrame;
     public String provider;

@@ -129,16 +129,8 @@ public class IntMesh implements Disposable {
     }
 
     /**
-     * Creates a new instanced Mesh with an extra group of per-instance attributes that is
-     * rewritten on every frame and kept in a buffer of its own.
-     *
-     * @param isStatic            whether the global and instance vertex data are static.
-     * @param maxVertices         the maximum number of vertices this mesh can hold.
-     * @param maxInstances        the maximum number of instances this mesh can hold.
-     * @param maxIndices          the maximum number of indices this mesh can hold.
-     * @param attributes          the global {@link VertexAttribute}s.
-     * @param attributesInstanced the per-instance attributes that rarely change.
-     * @param attributesDynamic   the per-instance attributes that change every frame, or null.
+     * Creates a new instanced Mesh with an extra group of per-instance attributes that is rewritten
+     * every frame and kept in a buffer of its own.
      */
     public IntMesh(boolean isStatic,
                    int maxVertices,
@@ -575,12 +567,8 @@ public class IntMesh implements Disposable {
     }
 
     /**
-     * Sets the per-frame instance attributes of this Mesh. They live in a buffer of their own, so
-     * uploading them does not touch the rest of the instance data.
-     *
-     * @param dynamic The attributes.
-     * @param offset  The offset, in floats.
-     * @param count   The number of floats to use.
+     * Sets the per-frame instance attributes. They live in a buffer of their own, so uploading them
+     * does not touch the rest of the instance data.
      */
     public void setDynamicAttribs(float[] dynamic,
                                   int offset,
@@ -991,10 +979,7 @@ public class IntMesh implements Disposable {
     }
 
     /**
-     * Returns the per-frame instance attribute with the given usage, if any.
-     *
-     * @param usage The usage, one of {@link VertexAttributes.Usage} or one of the custom usages.
-     * @return The attribute, or null if this mesh has no dynamic attribute with that usage.
+     * Returns the per-frame instance attribute with the given usage, or null if there is none.
      */
     public VertexAttribute getDynamicAttribute(int usage) {
         VertexAttributes attributes = ((VertexBufferObjectInstanced) vertices).getDynamicAttributes();

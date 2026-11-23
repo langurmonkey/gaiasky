@@ -10,15 +10,8 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Checks that the CPU path of the elements positions applies the transforms exactly as the elements
- * vertex shader does:
- * <pre>
- *     pos = u_transform * (keplerToCartesian() * u_refSysTransform) + u_datasetPos;
- * </pre>
- * The reference system is multiplied as a row vector, so its translation is not applied, while the
- * affine transformation is multiplied as a column vector and its translation is. Getting either of
- * the two the other way round leaves the elements of a group tilted with respect to the body they
- * belong to, which is very visible in a ring of particles.
+ * Checks that the CPU path applies the transforms exactly as the elements vertex shader does: the ref
+ * sys as a row vector (translation not applied), the affine as a column one (translation applied).
  */
 public class ElementPositionsTransformTest {
 

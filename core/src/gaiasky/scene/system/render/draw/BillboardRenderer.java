@@ -173,9 +173,8 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     }
 
     /**
-     * Depth-only pass over the same quads. The fragment shader keeps only the solid photosphere and
-     * writes its depth, so the late elements are occluded by the star body. The render group sets
-     * the colour mask and the depth write.
+     * Depth-only pass over the same quads: the shader keeps only the solid photosphere and writes
+     * its depth, so the late elements are occluded by the star body.
      */
     private void renderDepthStud(List<IRenderable> renderables, ICamera camera, double t) {
         ExtShaderProgram depthProgram = getShaderProgram();

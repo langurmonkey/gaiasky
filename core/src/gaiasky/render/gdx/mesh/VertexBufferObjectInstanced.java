@@ -26,9 +26,8 @@ public class VertexBufferObjectInstanced implements IntVertexData {
     final VertexAttributes globalAttributes;
     final VertexAttributes instanceAttributes;
     /**
-     * Per-instance attributes that change every frame, kept in a buffer of their own so that a
-     * per-frame update only uploads them and not the whole interleaved instance array. Null when
-     * the mesh has none.
+     * Per-instance attributes that change every frame, in a buffer of their own. Null when the mesh
+     * has none.
      **/
     final VertexAttributes dynamicAttributes;
     final FloatBuffer bufferGlobal;
@@ -69,13 +68,6 @@ public class VertexBufferObjectInstanced implements IntVertexData {
     /**
      * Constructs a new interleaved VertexBufferObjectWithVAO with an extra group of per-instance
      * attributes, kept in its own buffer.
-     *
-     * @param isStatic          whether the global and instance vertex data are static.
-     * @param numGlobal         the maximum number of vertices.
-     * @param globalAttributes  the global {@link VertexAttributes}.
-     * @param numInstance       the maximum number of instances.
-     * @param instanceAttributes per-instance attributes that rarely change.
-     * @param dynamicAttributes per-instance attributes that change on every frame, or null.
      */
     public VertexBufferObjectInstanced(boolean isStatic, int numGlobal, VertexAttributes globalAttributes, int numInstance, VertexAttributes instanceAttributes, VertexAttributes dynamicAttributes) {
         this.isStatic = isStatic;
@@ -170,11 +162,7 @@ public class VertexBufferObjectInstanced implements IntVertexData {
 
     /**
      * Uploads the dynamic per-instance attributes. The buffer is rewritten in full, so the driver
-     * is told to expect a stream rather than to keep the old contents.
-     *
-     * @param vertices The attributes, interleaved with the dynamic vertex size.
-     * @param offset   Offset into {@code vertices}, in floats.
-     * @param count    Number of floats to copy.
+     * is told to expect a stream.
      */
     public void setDynamic(float[] vertices, int offset, int count) {
         if (byteBufferDynamic == null) {

@@ -21,14 +21,8 @@ import java.io.File;
 import java.nio.file.Files;
 
 /**
- * A mesh with no texture coordinates cannot be textured: the vertex buffer is built without
- * {@code a_texCoord0}, the attribute keeps its default value and every fragment samples the same
- * texel. That used to make a material supplied from the dataset JSON (see
- * {@code ModelComponent.setMaterial}) useless on any model that has no {@code vt} entries, which is
- * what a shape-only OBJ looks like.
- * <p>
- * These tests pin the fallback projection, and that a file which does carry {@code vt} entries is
- * left alone.
+ * A mesh with no texture coordinates keeps the default {@code a_texCoord0}, so every fragment samples
+ * the same texel. These tests pin the fallback projection, and that files with {@code vt} are left alone.
  */
 public class OwnObjLoaderTest {
 

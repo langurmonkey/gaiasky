@@ -6,20 +6,8 @@
 // Based on the Fortran single-double package
 // http://crd.lbl.gov/~dhbailey/mpdist/
 
-// Optimization barrier.
-// The error-free transformations below (Knuth's two-sum, Dekker's product) are
-// only exact if the compiler neither contracts them into fused multiply-adds
-// nor reassociates the float arithmetic. GLSL before 4.00 has no way to forbid
-// that, so every intermediate is routed through an int round trip with a value
-// the compiler cannot know at compile time.
-// u_dsBarrier is deliberately never set by the application: an unset uniform is
-// 0, so the round trip is the identity at runtime while staying opaque to the
-// optimizer. Do not remove, and do not bind it.
-// The orbital elements shader opts out with DS_NO_BARRIER, because it relies on
-// the compiler contracting the error-free transformations to recover the speed
-// of the pre-barrier code. That is safe there and only there: it does not use
-// these transforms to keep a position stable over long time spans, it starts
-// from scratch on every vertex.
+// Optimization barrier: an int round trip the compiler cannot fold, so the transformations below
+// stay exact. u_dsBarrier is never set (0) and must not be bound; the elements shader opts out.
 #ifndef DS_NO_BARRIER
 uniform int u_dsBarrier = 0;
 float ds_hb(float x) {
@@ -195,10 +183,7 @@ vec2 ds_mod2pi(vec2 dsa) {
     return r;
 }
 
-// Mean anomaly (rad) in double-float, reduced to [0, 2*pi).
-//   deltat: time since epoch, in days, as a double-float
-//   period: orbital period, in days
-//   M0:     mean anomaly at epoch, in radians
+// Mean anomaly (rad) in double-float, reduced to [0, 2*pi). deltat and period in days, M0 in rad.
 vec2 ds_meanAnomaly(vec2 deltat, float period, float M0) {
     float n = DS_TWOPI.x / period;
     // Reduce modulo the period so n*deltat stays small.

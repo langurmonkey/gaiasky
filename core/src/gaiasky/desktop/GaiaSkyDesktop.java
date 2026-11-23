@@ -159,10 +159,8 @@ public class GaiaSkyDesktop {
 
             // macOS specifics.
             if (SysUtils.isMac()) {
-                // GLFW async lets the GLFW event loop run off the main thread, which
-                // AppKit reserves for itself. Needed with and without AWT.
-                // Must be set before GLFW is initialised (in init()), but it does not
-                // depend on the configuration, so it is safe to do here.
+                // GLFW async runs the event loop off the main thread, which AppKit reserves for
+                // itself. Must be set before GLFW is initialised; it does not depend on the config.
                 Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
             }
 
@@ -376,11 +374,8 @@ public class GaiaSkyDesktop {
     }
 
     /**
-     * Registers the `gaiasky://` URL protocol handler on macOS. This goes through install4j's
-     * {@link StartupNotification}, which uses {@code java.awt.Desktop}: AWT takes over
-     * NSApplication, so the native window controls (close, minimise, zoom) stop responding and
-     * the title bar switches to the light appearance. Only called when
-     * {@code program::macos::urlProtocol} is enabled in the configuration.
+     * Registers the `gaiasky://` URL protocol handler on macOS, through install4j's
+     * {@link StartupNotification}. AWT takes over NSApplication, so window controls stop working.
      */
     private static void initMacosUrlProtocol() {
         try {
