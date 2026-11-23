@@ -130,8 +130,10 @@ float lightVisibility(int li, float depth) {
         return 1.0;
     }
 
-    // Tolerance band on the near side, so the light does not occlude itself.
-    float edge = lightDepth * 1.0e-2;
+    // Cover the light's own photosphere, one radius in front of its centre. The angular radius
+    // comes normalised by the fov factor (see Body#solidAngleApparent).
+    float radiusOverDist = max(u_lightViewAngles[li], 0.0) * u_fovFactor;
+    float edge = lightDepth * max(1.0e-2, 2.0 * radiusOverDist);
     return smoothstep(lightDepth - 2.0 * edge, lightDepth - edge, depth);
 }
 

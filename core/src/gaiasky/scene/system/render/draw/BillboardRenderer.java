@@ -8,7 +8,6 @@
 package gaiasky.scene.system.render.draw;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -38,8 +37,8 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     private final BillboardEntityRenderSystem renderSystem;
     private IntMesh mesh;
     private Texture billboardTexture;
-    /** Optional depth-only variant of the same quads, see {@link #setDepthPrograms}. **/
-    private ExtShaderProgram[] depthPrograms;
+    /** When set, only the depth pass runs. **/
+    private boolean depthOnly;
 
     // Render metadata
 
@@ -142,6 +141,11 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        if (depthOnly) {
+            renderDepthStud(renderables, camera, t);
+            return;
+        }
+
         renderables.sort(comp);
 
         ExtShaderProgram shaderProgram = getShaderProgram();
@@ -166,26 +170,20 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
             render(entity, shaderProgram, mesh, camera);
         });
         shaderProgram.end();
-
-        if (depthPrograms != null) {
-            renderDepthStud(renderables, camera, t);
-        }
     }
 
     /**
-     * Depth-only pass over the same quads. The fragment shader of this variant keeps only the
-     * solid photosphere and writes its depth, so lines, labels and other late elements are
-     * occluded by the star body. Runs after the colour pass: both use the same less-than depth
-     * test, so the disc's own colour fragments would otherwise be rejected by the depth they
-     * have just written.
+     * Depth-only pass over the same quads. The fragment shader keeps only the solid photosphere and
+     * writes its depth, so the late elements are occluded by the star body. The render group sets
+     * the colour mask and the depth write.
      */
     private void renderDepthStud(List<IRenderable> renderables, ICamera camera, double t) {
-        ExtShaderProgram depthProgram = getShaderProgram(depthPrograms);
+        ExtShaderProgram depthProgram = getShaderProgram();
         depthProgram.begin();
-        // Colour goes nowhere, depth is written.
-        Gdx.gl.glColorMask(false, false, false, false);
-        Gdx.gl.glDepthMask(true);
         try {
+            if (billboardTexture != null) {
+                billboardTexture.bind(0);
+            }
             addCameraUpCubemapMode(depthProgram, camera);
             depthProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             depthProgram.setUniformf("u_time", (float) t);
@@ -197,18 +195,14 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
             });
         } finally {
             depthProgram.end();
-            Gdx.gl.glColorMask(true, true, true, true);
-            // Back to the state the pre-runnables set for this group.
-            Gdx.gl.glDepthMask(false);
         }
     }
 
     /**
-     * Sets the depth-only variant of the same quad programs. When set, a depth prepass runs after
-     * the colour pass for every billboard of this group.
+     * When set, the colour pass is skipped and only the depth pass runs.
      */
-    public void setDepthPrograms(ExtShaderProgram[] depthPrograms) {
-        this.depthPrograms = depthPrograms;
+    public void setDepthOnly(boolean depthOnly) {
+        this.depthOnly = depthOnly;
     }
 
     /**

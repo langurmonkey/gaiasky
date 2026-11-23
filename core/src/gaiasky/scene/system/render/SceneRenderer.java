@@ -435,6 +435,19 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
+            case BILLBOARD_STAR_DEPTH -> {
+                var depthRenderer = new BillboardRenderer(this,
+                                                         BILLBOARD_STAR_DEPTH,
+                                                         alphas,
+                                                         renderAssets.billboardStarDepthShaders,
+                                                         GaiaSky.settings().scene.star.getStarTexture(),
+                                                         true);
+                depthRenderer.setDepthOnly(true);
+                // Depth writes only, no colour.
+                depthRenderer.addPreRunnables(depthTestR, colorMaskOffR);
+                depthRenderer.addPostRunnables(colorMaskOnR);
+                system = depthRenderer;
+            }
             case BILLBOARD_STAR -> {
                 var starRenderer = new BillboardRenderer(this,
                                                          BILLBOARD_STAR,
@@ -442,10 +455,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                          renderAssets.billboardStarShaders,
                                                          GaiaSky.settings().scene.star.getStarTexture(),
                                                          true);
-                // Depth prepass for the solid photosphere, so that lines, labels and the
-                // rest of the late geometry are occluded by the star.
-                starRenderer.setDepthPrograms(renderAssets.billboardStarDepthShaders);
-                // Not additive: the photosphere has to block what is behind it.
+                // Premultiplied alpha: the photosphere blocks what is behind it.
                 starRenderer.addPreRunnables(premultipliedBlendR, depthTestNoWritesR);
                 starRenderer.addPostRunnables(lpu);
                 system = starRenderer;

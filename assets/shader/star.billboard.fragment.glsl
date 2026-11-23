@@ -56,11 +56,16 @@ void main() {
     float resolved = starResolved(pxR);
 
     #ifdef STAR_DEPTH_ONLY
-    // Depth-only pass: writes depth for the solid part only, so emission (corona, chromosphere, halo) occludes nothing.
-    if (starAlpha(rho, pxR, sprite, resolved) < 0.5) {
+    // Only the resolved model disc has a surface. In sprite mode the quad plane is not the star.
+    if (resolved <= 0.0 || rho >= 1.0) {
         discard;
     }
-    gl_FragDepth = getDepthValue(starSurfaceDepth(q, min(rho, 1.0)), u_zfar, u_k);
+    // Anti-aliased limb, as in the colour pass.
+    if (1.0 - smoothstep(1.0 - pxR, 1.0 + pxR, rho) < 0.5) {
+        discard;
+    }
+    // A hair beyond the surface, so the colour pass passes this pre-pass' depth test.
+    gl_FragDepth = getDepthValue(starSurfaceDepth(q, rho) * 1.0001, u_zfar, u_k);
     fragColor = vec4(0.0);
     layerBuffer = vec4(0.0);
     return;
@@ -84,8 +89,8 @@ void main() {
     // Premultiplied alpha: the disc replaces the background, the corona adds to it.
     fragColor = vec4(starTonemap(col.rgb) * v_color.a, col.a * v_color.a);
 
-    // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue(u_zfar, u_k);
+    // Depth of the body, not of the quad.
+    gl_FragDepth = getDepthValue(starSurfaceDepth(q, min(rho, 1.0)), u_zfar, u_k);
     // Alpha 0 leaves the layer buffer (lines, labels, grids) untouched; alpha 1 would erase it.
     layerBuffer = vec4(0.0);
 

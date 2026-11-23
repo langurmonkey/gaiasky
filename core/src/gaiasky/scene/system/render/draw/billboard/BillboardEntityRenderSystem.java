@@ -306,6 +306,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         shader.setUniformf("u_color", color[0], color[1], color[2], a);
         shader.setUniformf("u_inner_rad", (float) celestial.innerRad);
         shader.setUniformf("u_distance", (float) body.distToCamera);
+        shader.setUniformf("u_camDir", camera.getCamera().direction);
         shader.setUniformf("u_apparent_angle", (float) body.solidAngleApparent);
         shader.setUniformf("u_th_angle_point", (float) sa.thresholdPoint * fovFactor);
         shader.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
