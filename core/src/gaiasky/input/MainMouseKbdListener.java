@@ -524,7 +524,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         var modifier = isKeyPressed(Keys.SHIFT_LEFT) || isKeyPressed(Keys.CONTROL_LEFT);
         var keyboardFocus = GaiaSky.instance.mainGui.getGuiStage().getKeyboardFocus();
         if (!(keyboardFocus instanceof TextField)) {
-            float scaling = GaiaSky.settings().scene.camera.cinematic ? 0.01f : 1f;
+            float scaling = GaiaSky.settings().scene.camera.cinematic ? 0.01f : 0.08f;
             if (isKeyPressed(Keys.UP)) {
                 if (!modifier) {
                     camera.addForwardForce(1.0f);
@@ -551,7 +551,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
             }
             if (isKeyPressed(Keys.RIGHT)) {
                 if (!modifier) {
-                    camera.addRoll(2f * -scaling, true);
+                    camera.addRoll(-scaling, true);
                 } else {
                     if (camera.getMode().isFocus()) {
                         camera.addHorizontal(-scaling, true);
@@ -563,7 +563,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
             }
             if (isKeyPressed(Keys.LEFT)) {
                 if (!modifier) {
-                    camera.addRoll(2f * scaling, true);
+                    camera.addRoll(scaling, true);
                 } else {
                     if (camera.getMode().isFocus()) {
                         camera.addHorizontal(scaling, true);
