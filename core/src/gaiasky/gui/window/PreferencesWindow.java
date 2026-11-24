@@ -118,9 +118,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox restEnabled;
     private OwnCheckBox restLoopbackOnly;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality, antiAlias, lineRenderer, numThreads, screenshotMode,
-            screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect,
-            starTexIndex, glowTexIndex;
+    private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality;
+    private OwnSelectBox<ComboBoxBean<Integer>> antiAlias;
+    private OwnSelectBox<ComboBoxBean<Integer>> lineRenderer;
+    private OwnSelectBox<ComboBoxBean<Integer>> numThreads;
+    private OwnSelectBox<ComboBoxBean<Integer>> screenshotMode;
+    private OwnSelectBox<ComboBoxBean<Integer>> screenshotFormat;
+    private OwnSelectBox<ComboBoxBean<Integer>> frameOutputMode;
+    private OwnSelectBox<ComboBoxBean<Integer>> frameOutputFormat;
+    private OwnSelectBox<ComboBoxBean<Integer>> nShadows;
+    private OwnSelectBox<ComboBoxBean<Integer>> distUnitsSelect;
+    private OwnSelectBox<ComboBoxBean<Integer>> toneMappingSelect;
+    private OwnSelectBox<ComboBoxBean<Integer>> starTexIndex;
+    private OwnSelectBox<ComboBoxBean<Integer>> glowTexIndex;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin, recGridStyle, elementsPathSelect;
