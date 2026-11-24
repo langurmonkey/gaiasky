@@ -36,6 +36,8 @@ public interface IPostProcessor extends Disposable {
 
     boolean isLensFlareEnabled();
 
+    boolean isLightShaftsEnabled();
+
     enum RenderType {
         screen(0),
         screenshot(1),

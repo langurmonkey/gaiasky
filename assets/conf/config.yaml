@@ -648,6 +648,18 @@ postprocess:
   # Light glow effect
   lightGlow:
     active: true
+  # Light shafts (god rays) around a nearby star, when it is in view and further away than the
+  # objects standing in front of it.
+  lightShafts:
+    active: false
+    # Maximum strength of the effect.
+    strength: 0.6
+    # Frame buffer scale of the light mask. Lower is cheaper and softer.
+    fboScale: 0.25
+    # Number of samples along each ray.
+    samples: 32
+    # Radius of the lit halo around the light, in uv.
+    radius: 0.06
   # Re-projection as post-processing.
   # Modes are:
   # DISABLED

@@ -698,6 +698,11 @@ public enum Event {
     LIGHT_GLOW_CMD,
 
     /**
+     * Activate/deactivate the light shafts. Contains boolean with state.
+     **/
+    LIGHT_SHAFTS_CMD,
+
+    /**
      * Issues the command to update the line render system. Contains no
      * parameters.
      **/

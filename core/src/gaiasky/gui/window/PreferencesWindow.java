@@ -159,7 +159,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak, aberrationBak,
             lensFlareBak, filmGrainBak, stereoKBak, stereoIpdBak, stereoSdBak, plApertureBak, plAngleBak;
-    private boolean lightGlowBak, debugInfoBak, frameCoordinatesBak;
+    private boolean lightGlowBak, lightShaftsBak, debugInfoBak, frameCoordinatesBak;
     private float[] accentColorBak;
     private int aaQuality, AAQualityBak;
     private ReprojectionMode reprojectionBak;
@@ -1213,6 +1213,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             glowOverObjects.setChecked(settings.postprocess.lightGlow.active);
             glowOverObjects.connect(Event.LIGHT_GLOW_CMD);
 
+            // Light shafts over objects
+            OwnLabel lightShaftsLabel = new OwnLabel(I18n.msg("gui.lightshafts"), skin);
+            var lightShafts = new OwnCheckBox("", skin);
+            lightShafts.setName("light shafts");
+            lightShafts.setChecked(settings.postprocess.lightShafts.active);
+            lightShafts.connect(Event.LIGHT_SHAFTS_CMD);
+
             // Motion trails
             OwnLabel motionTrailsLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.trails"), skin);
             motionTrails = new OwnCheckBox("", skin);
@@ -1226,10 +1233,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // Add labels
             labels.add(starIndexLabel, glowIndexLabel);
             labels.add(starDistanceScalingLabel, glowOverObjectsLabel);
+            labels.add(lightShaftsLabel);
 
             // Add to table
             starsTable.add(glowOverObjectsLabel).left().padRight(pad34).padBottom(pad10);
             starsTable.add(glowOverObjects).left().padRight(pad18).padBottom(pad10).row();
+            starsTable.add(lightShaftsLabel).left().padRight(pad34).padBottom(pad10);
+            starsTable.add(lightShafts).left().padRight(pad18).padBottom(pad10).row();
             starsTable.add(motionTrailsLabel).left().padRight(pad34).padBottom(pad10);
             starsTable.add(motionTrails).left().padRight(pad18).padBottom(pad10).row();
             if (p1 != null) {
@@ -3121,6 +3131,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         filmGrainBak = settings.postprocess.filmGrain.intensity;
         lensFlareBak = settings.postprocess.lensFlare.strength;
         lightGlowBak = settings.postprocess.lightGlow.active;
+        lightShaftsBak = settings.postprocess.lightShafts.active;
         brightnessBak = settings.postprocess.levels.brightness;
         contrastBak = settings.postprocess.levels.contrast;
         hueBak = settings.postprocess.levels.hue;
@@ -3671,6 +3682,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.GAMMA_CMD, this, gammaBak);
         EventManager.publish(Event.LENS_FLARE_CMD, this, lensFlareBak);
         EventManager.publish(Event.LIGHT_GLOW_CMD, this, lightGlowBak);
+        EventManager.publish(Event.LIGHT_SHAFTS_CMD, this, lightShaftsBak);
         EventManager.publish(Event.BLOOM_CMD, this, bloomBak);
         EventManager.publish(Event.UNSHARP_MASK_CMD, this, unsharpMaskBak);
         EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, this, aberrationBak);

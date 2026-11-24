@@ -141,6 +141,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                         Event.MOTION_BLUR_CMD,
                                         Event.LIGHT_POS_2D_UPDATE,
                                         Event.LIGHT_GLOW_CMD,
+                                        Event.LIGHT_SHAFTS_CMD,
                                         Event.REPROJECTION_CMD,
                                         Event.CUBEMAP_CMD,
                                         Event.ANTIALIASING_CMD,
@@ -243,6 +244,17 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
         ssrEffect.setEnabled(settings.postprocess.ssr.active && !vr && !safeMode);
         ppb.add(ssrEffect);
+
+        // LIGHT SHAFTS
+        var shaftsSettings = settings.postprocess.lightShafts;
+        var lightShafts = new LightShafts((int) (width * shaftsSettings.fboScale), (int) (height * shaftsSettings.fboScale));
+        lightShafts.setStrength(shaftsSettings.strength);
+        lightShafts.setRadius(shaftsSettings.radius);
+        lightShafts.setSamples(shaftsSettings.samples);
+        lightShafts.setEnabled(shaftsSettings.active && !safeMode);
+        // The light is projected once for the whole screen: not usable in cubemap or stereo.
+        lightShafts.setEnabledOptions(false, false);
+        ppb.add(lightShafts);
 
         // CAMERA MOTION BLUR
         var cameraMotionBlur = new CameraMotionBlur(width, height);
@@ -645,6 +657,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             // light data.
                             lightGlow.setFovFactor(GaiaSky.instance.cameraManager.getFovFactor());
                         }
+                        LightShafts shafts = (LightShafts) ppb.get(LightShafts.class);
+                        if (shafts != null && shafts.isEnabled()) {
+                            shafts.setLights(nLights, lightPos, depths, colors, intensities);
+                        }
                         if (!lensFlareSettings.type.isPseudoLensFlare()) {
                             LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
                             if (lensFlare != null && lensFlare.isEnabled()) {
@@ -667,6 +683,18 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
                         if (lightGlow != null) {
                             lightGlow.setEnabled(lightGlowActive);
+                        }
+                    }
+                }
+            }
+            case LIGHT_SHAFTS_CMD -> {
+                var shaftsActive = (Boolean) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        LightShafts lightShafts = (LightShafts) ppb.get(LightShafts.class);
+                        if (lightShafts != null) {
+                            lightShafts.setEnabled(shaftsActive);
                         }
                     }
                 }
@@ -1208,6 +1236,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     @Override
     public boolean isLensFlareEnabled() {
         return isEnabled(LensFlare.class);
+    }
+
+    @Override
+    public boolean isLightShaftsEnabled() {
+        return isEnabled(LightShafts.class);
     }
 
     private void updateStereo(boolean stereo, StereoProfile profile) {

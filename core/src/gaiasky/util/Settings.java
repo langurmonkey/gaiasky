@@ -4084,6 +4084,9 @@ public class Settings extends SettingsObject {
         public FilmGrainSettings filmGrain;
         public LensFlareSettings lensFlare;
         public LightGlowSettings lightGlow;
+        // Initialised here as well, so that configuration files written before this setting existed
+        // still get a valid object.
+        public LightShaftsSettings lightShafts = new LightShaftsSettings();
         public LevelsSettings levels;
         public ToneMappingSettings toneMapping;
         public SSRSettings ssr;
@@ -4123,6 +4126,7 @@ public class Settings extends SettingsObject {
                         lensFlare.strength = strength;
                     }
                     case LIGHT_GLOW_CMD -> lightGlow.active = (Boolean) data[0];
+                    case LIGHT_SHAFTS_CMD -> lightShafts.active = (Boolean) data[0];
                     case SSR_CMD -> ssr.active = (Boolean) data[0];
                     case MOTION_BLUR_CMD -> {
                         motionBlur.strength = (Float) data[0];
@@ -4167,6 +4171,7 @@ public class Settings extends SettingsObject {
             c.filmGrain = this.filmGrain.clone();
             c.lensFlare = this.lensFlare.clone();
             c.lightGlow = this.lightGlow.clone();
+            c.lightShafts = this.lightShafts.clone();
             c.levels = this.levels.clone();
             c.toneMapping = this.toneMapping.clone();
             c.ssr = this.ssr.clone();
@@ -4186,6 +4191,7 @@ public class Settings extends SettingsObject {
             filmGrain.setParent(s);
             lensFlare.setParent(s);
             lightGlow.setParent(s);
+            lightShafts.setParent(s);
             levels.setParent(s);
             toneMapping.setParent(s);
             ssr.setParent(s);
@@ -4198,7 +4204,8 @@ public class Settings extends SettingsObject {
         @Override
         protected void setupListeners() {
             EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD,
-                                            Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD,
+                                            Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.LIGHT_SHAFTS_CMD,
+                                            Event.REPROJECTION_CMD,
                                             Event.BRIGHTNESS_CMD,
                                             Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD,
                                             Event.TONEMAPPING_TYPE_CMD,
@@ -4213,6 +4220,7 @@ public class Settings extends SettingsObject {
             filmGrain.setupListeners();
             lensFlare.setupListeners();
             lightGlow.setupListeners();
+            lightShafts.setupListeners();
             levels.setupListeners();
             toneMapping.setupListeners();
             ssr.setupListeners();
@@ -4231,6 +4239,7 @@ public class Settings extends SettingsObject {
             filmGrain.dispose();
             lensFlare.dispose();
             lightGlow.dispose();
+            lightShafts.dispose();
             levels.dispose();
             toneMapping.dispose();
             ssr.dispose();
@@ -4251,6 +4260,7 @@ public class Settings extends SettingsObject {
                 EventManager.publish(Event.FILM_GRAIN_CMD, this, filmGrain.intensity);
                 EventManager.publish(Event.LENS_FLARE_CMD, this, lensFlare.strength);
                 EventManager.publish(Event.LIGHT_GLOW_CMD, this, lightGlow.active);
+                EventManager.publish(Event.LIGHT_SHAFTS_CMD, this, lightShafts.active);
                 EventManager.publish(Event.SSR_CMD, this, ssr.active);
                 EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.strength);
                 EventManager.publish(Event.REPROJECTION_CMD, this, reprojection.active, reprojection.mode);
@@ -4529,6 +4539,41 @@ public class Settings extends SettingsObject {
             @Override
             public LightGlowSettings clone() {
                 return (LightGlowSettings) super.clone();
+            }
+
+            @Override
+            protected void setParentRecursive(SettingsObject s) {
+            }
+
+            @Override
+            protected void setupListeners() {
+            }
+
+            @Override
+            public void dispose() {
+            }
+
+            @Override
+            public void apply() {
+            }
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class LightShaftsSettings extends SettingsObject {
+            /** Whether the effect is active. */
+            public boolean active;
+            /** Maximum strength of the effect. */
+            public float strength = 0.6f;
+            /** Frame buffer scale of the light mask. Lower is cheaper and softer. */
+            public float fboScale = 0.25f;
+            /** Number of samples along each ray. */
+            public int samples = 32;
+            /** Radius of the lit halo around the light, in uv. */
+            public float radius = 0.06f;
+
+            @Override
+            public LightShaftsSettings clone() {
+                return (LightShaftsSettings) super.clone();
             }
 
             @Override
