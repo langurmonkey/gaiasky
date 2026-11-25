@@ -7,6 +7,8 @@
 
 package gaiasky.render.gdx.shader;
 
+import gaiasky.GaiaSky;
+import gaiasky.util.Settings;
 import gaiasky.util.Bits;
 import gaiasky.render.gdx.IntRenderable;
 import gaiasky.render.gdx.shader.attribute.AtmosphereAttribute;
@@ -90,6 +92,9 @@ public class GroundShader extends RelativisticShader {
             prefix += "#define atmosphereGround\n";
         if (mask.has(AtmosphereAttribute.KrESun))
             prefix += "#define atmosphereObject\n";
+        // With a tone mapper in the chain the atmosphere hands over linear radiance instead.
+        if (mask.has(AtmosphereAttribute.CameraHeight) && GaiaSky.settings().postprocess.toneMapping.type != Settings.ToneMapping.NONE)
+            prefix += "#define atmosphereLinear\n";
         return prefix;
     }
 

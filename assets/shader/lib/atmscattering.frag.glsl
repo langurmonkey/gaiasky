@@ -6,6 +6,10 @@
 
 #define exposure 2.0           /* Tone-mapping exposure for the atmosphere */
 
+/* Cosine of the angular radius of the Sun (~0.267 deg). The Mie term assumes a point source, so
+   clamping its argument to the solar disk spreads the singularity over the disk instead of a pixel. */
+#define MIE_COS_MAX 0.99998917
+
 uniform vec3 v3PlanetPos; /* Planet position relative to camera origin */
 uniform vec3 v3CameraPos; /* Camera position in normalized coordinates (inner radius = 1) */
 uniform vec3 v3LightPos; /* Unit vector towards the sun */
@@ -33,6 +37,17 @@ uniform int nSamples;
 
 float rayleighPhase(float fCos2) {
     return 0.75 + 0.75 * fCos2;
+}
+
+/* Display mapping of the in-scattered radiance. With atmosphereLinear the frame is tone-mapped
+   later on, so the radiance is handed over untouched and the map is applied once, keeping the
+   highlight gradient. Otherwise there is no later stage and the map is applied here. */
+vec3 atmDisplay(vec3 radiance) {
+#ifdef atmosphereLinear
+    return radiance;
+#else
+    return vec3(1.0) - exp(radiance * -exposure);
+#endif
 }
 
 float miePhase(float fCos, float fCos2) {
@@ -141,14 +156,14 @@ void computeAtmosphericScatteringGround(vec3 v_position, out vec3 outGlow, out v
     vec3 v3FrontColor = integrateAtmosphere(v3Start, v3Ray, fFar, v3Attenuate);
 
     // Phase functions for the viewing angle
-    float fCos = clamp(dot(v3LightPos, v3Ray), -0.9999, 0.9999);
+    float fCos = clamp(dot(v3LightPos, v3Ray), -0.9999, MIE_COS_MAX);
     float fCos2 = fCos * fCos;
 
     vec3 rayleighColor = rayleighPhase(fCos2) * v3FrontColor * (v3InvWavelength * fKrESun);
     vec3 mieColor = miePhase(fCos, fCos2) * v3FrontColor * fKmESun;
 
-    // Tone-mapped glow and transmittance at the surface point
-    outGlow = (vec3(1.0) - exp((rayleighColor + mieColor) * -exposure)) * fAlpha;
+    // Glow and transmittance at the surface point
+    outGlow = atmDisplay(rayleighColor + mieColor) * fAlpha;
     outTransmittance = v3Attenuate;
 }
 #else
@@ -189,25 +204,27 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     vec3 v3FrontColor = integrateAtmosphere(v3Start, v3Ray, fFar, v3Attenuate);
 
     // Phase functions for the viewing angle
-    float fCos = clamp(dot(v3LightPos, v3Ray), -0.9999, 0.9999);
+    float fCos = clamp(dot(v3LightPos, v3Ray), -0.9999, MIE_COS_MAX);
     float fCos2 = fCos * fCos;
 
     vec3 rayleighColor = rayleighPhase(fCos2) * v3FrontColor * (v3InvWavelength * fKrESun);
     vec3 mieColor = miePhase(fCos, fCos2) * v3FrontColor * fKmESun;
 
-    vec4 tonedAtmosphere = vec4(vec3(1.0) - exp((rayleighColor + mieColor) * -exposure), 1.0);
+    vec3 radiance = rayleighColor + mieColor;
+    vec4 atmosphere = vec4(atmDisplay(radiance), 1.0);
 
     // Alpha fade: inner boundary at 10% of atmosphere height
     float inner = fInnerRadius + (fOuterRadius - fInnerRadius) * 0.1;
     // Normalized camera height: 1 at inner boundary, 0 in space
     float heightNormalized = 1.0 - clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
     float fadeFactor = smoothstep(0.1, 1.0, 1.0 - heightNormalized);
-    float lma = luma(tonedAtmosphere.rgb);
+    // Opacity follows the display-mapped luminance in both modes, so the fade does not change.
+    float lma = luma(vec3(1.0) - exp(radiance * -exposure));
     float scl = smoothstep(0.2, 0.5, lma);
 
-    tonedAtmosphere.a = (heightNormalized * (1.0 - fadeFactor) + lma * fadeFactor) * scl * fAlpha;
+    atmosphere.a = (heightNormalized * (1.0 - fadeFactor) + lma * fadeFactor) * scl * fAlpha;
 
-    return tonedAtmosphere;
+    return atmosphere;
 }
 #else
 vec4 computeAtmosphericScattering(vec3 v_position) {

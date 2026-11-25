@@ -18,6 +18,7 @@ import gaiasky.GaiaSky;
 import gaiasky.render.gdx.shader.attribute.*;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.render.gdx.IntRenderable;
 import gaiasky.render.gdx.shader.attribute.*;
 import gaiasky.render.gdx.shader.provider.ShaderProgramProvider;
@@ -226,6 +227,10 @@ public class AtmosphereShader extends BaseIntShader {
         }
         if (GaiaSky.settings().postprocess.ssr.active) {
             prefix.append("#define ssrFlag\n");
+        }
+        // With a tone mapper in the chain the atmosphere hands over linear radiance instead.
+        if (GaiaSky.settings().postprocess.toneMapping.type != Settings.ToneMapping.NONE) {
+            prefix.append("#define atmosphereLinear\n");
         }
         return prefix.toString();
     }

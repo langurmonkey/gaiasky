@@ -29,5 +29,9 @@ void main()
 {
     vec3 tex = clamp(texture(u_texture0, v_texCoords).rgb, 0.0, 10.0);
     float brightness = luma(tex);
-    fragColor = vec4(tex.rgb * step(u_threshold, brightness), 1.0);
+    // Soft knee: a hard step makes everything brighter than the threshold contribute in full, so a
+    // saturated sky blooms as hard as a star. The shoulder fades the contribution in instead.
+    float high = max(u_threshold * 2.0, u_threshold + 1.0e-4);
+    float w = smoothstep(u_threshold, high, brightness);
+    fragColor = vec4(tex.rgb * w, 1.0);
 }

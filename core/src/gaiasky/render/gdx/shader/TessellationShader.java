@@ -7,6 +7,8 @@
 
 package gaiasky.render.gdx.shader;
 
+import gaiasky.GaiaSky;
+import gaiasky.util.Settings;
 import gaiasky.util.Bits;
 import gaiasky.render.gdx.IntRenderable;
 import gaiasky.render.gdx.model.IntMeshPart;
@@ -91,6 +93,9 @@ public class TessellationShader extends GroundShader {
         // Atmosphere ground only if camera height is set
         if (mask.has(AtmosphereAttribute.CameraHeight))
             prefix += "#define atmosphereGround\n";
+        // With a tone mapper in the chain the atmosphere hands over linear radiance instead.
+        if (mask.has(AtmosphereAttribute.CameraHeight) && GaiaSky.settings().postprocess.toneMapping.type != Settings.ToneMapping.NONE)
+            prefix += "#define atmosphereLinear\n";
         return prefix;
     }
 
