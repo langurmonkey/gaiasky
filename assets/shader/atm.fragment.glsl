@@ -23,13 +23,15 @@ in vec3 v_position;
 
 void main(void) {
     vec4 atmosphereColor = computeAtmosphericScattering(v_position);
-    //fragColor = vec4(atmosphereColor.rgb * atmosphereColor.a, atmosphereColor.a);
+    // Premultiplied: rgb already carries the coverage, so the blend replaces that fraction of the
+    // background instead of adding to it.
     fragColor = atmosphereColor;
     #ifdef eclipsingBodyFlag
     fragColor *= v_eclipseFactor;
     #endif // eclipsingBodyFlag
 
-    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
+    // Alpha 0 leaves the layer buffer (lines, labels, grids) untouched; alpha 1 would erase it.
+    layerBuffer = vec4(0.0);
 
     // Constant depth: the distance to the planet centre in internal units, which reproduces the
     // scale-1 behaviour at every distance scale (see SceneRenderer#snapshotDepth).

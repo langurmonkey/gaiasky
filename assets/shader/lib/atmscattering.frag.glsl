@@ -10,6 +10,11 @@
    clamping its argument to the solar disk spreads the singularity over the disk instead of a pixel. */
 #define MIE_COS_MAX 0.99998917
 
+/* Angular radius of the Solar disc (0.267 deg) and of its soft outer edge (0.8 deg), as cosines.
+   Inside them the sky gives way to the star it scatters the light of. */
+#define SUN_HOLE_COS_INNER 0.99998917
+#define SUN_HOLE_COS_OUTER 0.99990256
+
 uniform vec3 v3PlanetPos; /* Planet position relative to camera origin */
 uniform vec3 v3CameraPos; /* Camera position in normalized coordinates (inner radius = 1) */
 uniform vec3 v3LightPos; /* Unit vector towards the sun */
@@ -30,6 +35,7 @@ uniform float fG; /* Mie phase asymmetry factor */
 uniform vec3 v3O3InvWavelength; /* Ozone absorption coefficients per RGB channel */
 uniform float fO3PeakHeight; /* Ozone layer peak altitude (normalized, height above surface) */
 uniform float fO3Width; /* Ozone layer Gaussian width (normalized) */
+uniform float fGeometryRadius; /* Radius the sky dome is drawn at, in planet radii (1 = the surface) */
 
 uniform int nSamples;
 
@@ -184,10 +190,13 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
 
     // Sky dome vertex on the outer atmosphere shell
     vec3 v3Pos = normalize(v_position) * fOuterRadius;
-    // Ray from camera to sky dome vertex
-    vec3 v3Ray = v3Pos - v3CameraPos;
-    float fFar = length(v3Ray);
-    v3Ray /= fFar;
+    // Direction of the pixel: the fragment was rasterized on the dome, a sphere centred on the
+    // planet at fGeometryRadius, so the ray has to start from that very sphere. Placing the
+    // fragment on another radius (as if the dome were the shell) tilts the ray by several degrees
+    // and takes the sun away from where it is drawn.
+    vec3 v3Ray = normalize(normalize(v_position) * fGeometryRadius - v3CameraPos);
+    // March span, measured to the shell in the direction of the vertex.
+    float fFar = length(v3Pos - v3CameraPos);
 
     // Determine ray start: if inside the atmosphere, start at the camera;
     // otherwise, start at the outer atmosphere boundary.
@@ -211,7 +220,6 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     vec3 mieColor = miePhase(fCos, fCos2) * v3FrontColor * fKmESun;
 
     vec3 radiance = rayleighColor + mieColor;
-    vec4 atmosphere = vec4(atmDisplay(radiance), 1.0);
 
     // Alpha fade: inner boundary at 10% of atmosphere height
     float inner = fInnerRadius + (fOuterRadius - fInnerRadius) * 0.1;
@@ -222,9 +230,15 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     float lma = luma(vec3(1.0) - exp(radiance * -exposure));
     float scl = smoothstep(0.2, 0.5, lma);
 
-    atmosphere.a = (heightNormalized * (1.0 - fadeFactor) + lma * fadeFactor) * scl * fAlpha;
+    // Coverage of the sky: the fraction of the background the atmosphere replaces. It is the alpha
+    // of the premultiplied output, so a full daytime sky hides the stars and the panorama behind it.
+    float coverage = (heightNormalized * (1.0 - fadeFactor) + lma * fadeFactor) * scl * fAlpha;
 
-    return atmosphere;
+    // The star a sky belongs to is not hidden by it. Inside its disc the layer is composited
+    // additively, so the star keeps its full radiance over the glare instead of being wiped out.
+    float sunHole = smoothstep(SUN_HOLE_COS_OUTER, SUN_HOLE_COS_INNER, fCos);
+
+    return vec4(atmDisplay(radiance) * mix(coverage, 1.0, sunHole), coverage * (1.0 - sunHole));
 }
 #else
 vec4 computeAtmosphericScattering(vec3 v_position) {

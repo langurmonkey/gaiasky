@@ -21,6 +21,9 @@ public class AtmosphereAttribute extends FloatAttribute {
     /** Distance from the eye to the planet centre, in internal units. Written as the fragment depth. **/
     public static final String DepthDistAlias = "depthDist";
     public static final int DepthDist = register(DepthDistAlias);
+    /** Radius at which the sky dome is drawn, in planet radii (1 = the surface). **/
+    public static final String GeometryRadiusAlias = "geometryRadius";
+    public static final int GeometryRadius = register(GeometryRadiusAlias);
     public static final String KrESunAlias = "krESun";
     public static final int KrESun = register(KrESunAlias);
     public static final String KmESunAlias = "kmESun";

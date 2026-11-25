@@ -95,10 +95,10 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
             atmMat = pair.getSecond().get("base");
 
             setUpAtmosphericScatteringMaterial(atmMat);
-            //atmMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
-            atmMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE));
-            //atmMat.set(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA));
-            //atmMat.set(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE));
+            // Premultiplied over: the sky replaces the background by its coverage instead of adding
+            // to it, so a bright sky hides the stars behind it. The fragment shader must therefore
+            // output rgb * a, a.
+            atmMat.set(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA));
             // CREATE ATMOSPHERE MODEL
             mc.instance = new IntModelInstance(atmosphereModel, this.localTransform);
         } else {
@@ -109,6 +109,24 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
     public void update(Vector3Q transform) {
         transform.setToTranslation(localTransform).scl(size);
+    }
+
+    /**
+     * Radius at which the sky dome is drawn, in units of the planet radius (1 = the surface). The
+     * dome is a sphere centred on the planet, not the camera, so the shader needs this to recover
+     * the view direction of each fragment: it is the radius of the drawn mesh, which does not have
+     * to be the outer atmosphere boundary.
+     */
+    private float domeRadius() {
+        if (params != null && params.get("diameter") instanceof Number diameter && size > 0f && planetSize > 0f) {
+            // Mesh radius times the instance scale, divided by the planet radius.
+            float meshRadius = diameter.floatValue() * 0.5f;
+            float r = meshRadius * size / (planetSize * 0.5f);
+            if (r > 0f) {
+                return r;
+            }
+        }
+        return m_fOuterRadius;
     }
 
     private void addOzoneUniforms(Material mat,
@@ -177,6 +195,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.CameraHeight, camHeight));
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.OuterRadius, m_fOuterRadius));
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.InnerRadius, m_fInnerRadius));
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.GeometryRadius, domeRadius()));
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.KrESun, m_Kr * m_ESun));
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.KmESun, m_Km * m_ESun));
@@ -296,6 +315,14 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
             else
                 mat.set(new AtmosphereAttribute(AtmosphereAttribute.DepthDist, depthDist));
         }
+
+        // Radius of the dome the sky is drawn on, in planet radii. Refreshed because the size of
+        // procedural atmospheres moves with their radius.
+        float geometryRadius = domeRadius();
+        if (mat.has(AtmosphereAttribute.GeometryRadius))
+            ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.GeometryRadius))).value = geometryRadius;
+        else
+            mat.set(new AtmosphereAttribute(AtmosphereAttribute.GeometryRadius, geometryRadius));
 
         // Normalization factor scales camera position to normalized units (inner radius = 1.0).
         float normFactor = 2f / planetSize;
