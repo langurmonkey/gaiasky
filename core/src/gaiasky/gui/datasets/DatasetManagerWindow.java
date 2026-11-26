@@ -29,6 +29,7 @@ import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.main.GSKeys;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.input.ScreenGamepadListener;
 import gaiasky.input.ScreenKbdListener;
@@ -1391,10 +1392,21 @@ public class DatasetManagerWindow extends GenericDialog {
 
     @Override
     public void setKeyboardFocus() {
-        if (stage != null && selectedDataset[selectedTab] != null) {
-            Button button = buttonMap.get(selectedTab).get(selectedDataset[selectedTab].key);
-            if (button != null) {
-                stage.setKeyboardFocus(button);
+        var set = false;
+        if (stage != null) {
+            if (selectedDataset[selectedTab] != null) {
+                Button button = buttonMap.get(selectedTab).get(selectedDataset[selectedTab].key);
+                if (button != null) {
+                    stage.setKeyboardFocus(button);
+                    set = true;
+                }
+            }
+
+            if (!set) {
+                // Set focus to filter.
+                if (filter != null) {
+                    stage.setKeyboardFocus(filter);
+                }
             }
         }
     }
@@ -1778,6 +1790,18 @@ public class DatasetManagerWindow extends GenericDialog {
         @Override
         public boolean moveDown() {
             return down();
+        }
+
+        @Override
+        public boolean keyUp(int keyCode) {
+            // Filter
+            if (keyCode == GSKeys.F) {
+                if (stage != null && filter != null) {
+                    stage.setKeyboardFocus(filter);
+                    return true;
+                }
+            }
+            return super.keyUp(keyCode);
         }
     }
 
